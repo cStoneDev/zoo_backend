@@ -1,10 +1,13 @@
 package org.app.zoo.model;
 
+import java.sql.Date;
+
 import io.swagger.annotations.ApiModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @ApiModel(description = "Details about an animal")
@@ -13,21 +16,23 @@ public class Animal {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id_animal;
 
+    @Size(min=3) //Name cannot be less than 3 characters
     private String nombre;
+
     private int id_raza;
     private int edad;
     private double peso;
-    private int dias_zoo;
+    private Date fecha_ingreso;
 
-    public Animal(){}
+    protected Animal(){}
 
-    public Animal(int id_animal, String nombre, int id_raza, int edad, double peso, int dias_zoo) {
+    public Animal(int id_animal, String nombre, int id_raza, int edad, double peso, Date fecha_ingreso) {
         setId_animal(id_animal);
         setNombre(nombre);
         setId_raza(id_raza);
         setEdad(edad);
         setPeso(peso);
-        setDias_zoo(dias_zoo);
+        setDias_zoo(fecha_ingreso);
     }
 
 
@@ -61,11 +66,11 @@ public class Animal {
     public void setPeso(double peso) {
         this.peso = peso;
     }
-    public int getDias_zoo() {
-        return dias_zoo;
+    public Date getDias_zoo() {
+        return fecha_ingreso;
     }
-    public void setDias_zoo(int dias_zoo) {
-        this.dias_zoo = dias_zoo;
+    public void setDias_zoo(Date fecha_ingreso) {
+        this.fecha_ingreso = fecha_ingreso;
     }
 
     
