@@ -1,15 +1,13 @@
-package org.app.zoo.service;
+package org.app.zoo.role;
 import java.util.List;
 
-import org.app.zoo.model.Role;
-import org.app.zoo.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Service
-@ApiModel(description = "Role service who has the implementations of crud functions and more")
+@Schema(description = "Role service who has the implementations of crud functions and more")
 public class RoleService {
     @Autowired
     private final RoleRepository roleRepository;

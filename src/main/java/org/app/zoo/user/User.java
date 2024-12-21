@@ -1,6 +1,7 @@
-package org.app.zoo.model;
+package org.app.zoo.user;
 
-import io.swagger.annotations.ApiModel;
+import org.app.zoo.role.Role;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import jakarta.persistence.Table;
 
 
 @Entity
-@ApiModel(description = "Details about users")
+@Schema(description = "Details about users")
 @Table(name = "usuario")
 public class User {
     @Id

@@ -1,24 +1,15 @@
-package org.app.zoo.model;
+package org.app.zoo.role;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import org.hibernate.mapping.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import io.swagger.annotations.ApiModel;
-import jakarta.persistence.CascadeType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@ApiModel(description = "Details about roles")
+@Schema(description = "Details about roles")
 @Table(name = "rol")
 public class Role {
     @Id
