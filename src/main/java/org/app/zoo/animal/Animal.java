@@ -1,9 +1,8 @@
-package org.app.zoo.model;
+package org.app.zoo.animal;
 
 import java.sql.Date;
 
-import io.swagger.annotations.ApiModel;
-import jakarta.persistence.Column;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,10 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@ApiModel(description = "Details about an animal")
+@Schema(description = "Details about an animal")
 public class Animal {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id_animal;
 
     @Size(min=3) //Name cannot be less than 3 characters
