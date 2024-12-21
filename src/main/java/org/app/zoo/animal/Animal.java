@@ -1,4 +1,4 @@
-package org.app.zoo.model;
+package org.app.zoo.animal;
 
 import java.sql.Date;
 
