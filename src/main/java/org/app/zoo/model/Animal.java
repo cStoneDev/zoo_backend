@@ -2,7 +2,7 @@ package org.app.zoo.model;
 
 import java.sql.Date;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@ApiModel(description = "Details about an animal")
+@Schema(description = "Details about an animal")
 public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

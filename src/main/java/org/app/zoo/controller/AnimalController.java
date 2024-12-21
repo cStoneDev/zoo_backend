@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
 @RequestMapping("/animals")
-@ApiModel(description = "Animal controller class to handle HTTP requests")
+@Schema(description = "Animal controller class to handle HTTP requests")
 public class AnimalController {
     @Autowired
     private AnimalService animalService;

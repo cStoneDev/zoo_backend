@@ -7,10 +7,10 @@ import org.app.zoo.repository.AnimalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Service
-@ApiModel(description = "Animal service who has the implementations of crud functions and more")
+@Schema(description = "Animal service who has the implementations of crud functions and more")
 public class AnimalService {
     @Autowired
     private AnimalRepository animalRepository;
