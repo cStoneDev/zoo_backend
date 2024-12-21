@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.app.zoo.role.Role;
 import org.app.zoo.role.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,14 +13,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Service
 @Schema(description = "User service who has the implementations of crud functions and more")
 public class UserService {
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final RoleRepository roleRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public User createUser(User user) {
@@ -29,6 +30,11 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
         
         user.setRol(role);
+        return userRepository.save(user);
+    }
+
+    public User saveUser(User user) {
+        user.setClave(bCryptPasswordEncoder.encode(user.getClave()));
         return userRepository.save(user);
     }
 
