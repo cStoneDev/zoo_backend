@@ -3,6 +3,7 @@ package org.app.zoo.model;
 import java.sql.Date;
 
 import io.swagger.annotations.ApiModel;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +14,7 @@ import jakarta.validation.constraints.Size;
 @ApiModel(description = "Details about an animal")
 public class Animal {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id_animal;
 
     @Size(min=3) //Name cannot be less than 3 characters
