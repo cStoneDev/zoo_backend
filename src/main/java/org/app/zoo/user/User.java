@@ -26,16 +26,18 @@ public class User {
     private Role rol;
 
     @Column(name = "nombre_usuario", nullable = false)
-    private String nombreUsuario;
-    private String clave;
+    private String username;
+    
+    @Column(name = "clave")
+    private String password;
 
     public User(){}
 
-    public User(int id_usuario, Role rol, String nombreUsuario, String clave) {
+    public User(int id_usuario, Role rol, String username, String password) {
         setId_usuario(id_usuario);
         setRol(rol);
-        setNombre_usuario(nombreUsuario);
-        setClave(clave);
+        setUsername(username);
+        setPassword(password);
     }
 
 
@@ -51,17 +53,17 @@ public class User {
     public void setRol(Role rol) {
         this.rol = rol;
     }
-    public String getNombre_usuario() {
-        return nombreUsuario;
+    public String getUsername() {
+        return username;
     }
-    public void setNombre_usuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setUsername(String username) {
+        this.username = username;
     }
-    public String getClave() {
-        return clave;
+    public String getPassword() {
+        return password;
     }
-    public void setClave(String clave) {
-        this.clave = clave;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     
