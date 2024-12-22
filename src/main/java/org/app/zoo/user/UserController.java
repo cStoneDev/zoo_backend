@@ -39,11 +39,6 @@ public class UserController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/add")
-    public User addUser(@RequestBody User user) {
-        return userService.saveUser(user);
-    }
-
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();

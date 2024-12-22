@@ -30,10 +30,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
         
         user.setRol(role);
-        return userRepository.save(user);
-    }
-
-    public User saveUser(User user) {
         user.setClave(bCryptPasswordEncoder.encode(user.getClave()));
         return userRepository.save(user);
     }
