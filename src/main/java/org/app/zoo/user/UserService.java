@@ -28,10 +28,10 @@ public class UserService implements UserDetailsService{
 
     public User createUser(User user) {
         // Validación de existencia del rol
-        Role role = roleRepository.findByNombre(user.getRol().getNombre())
+        Role role = roleRepository.findByName(user.getRole().getName())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
         
-        user.setRol(role);
+        user.setRole(role);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -52,7 +52,7 @@ public class UserService implements UserDetailsService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .map(user -> {
-                    String role = "ROLE_" + user.getRol().getNombre();    
+                    String role = "ROLE_" + user.getRole().getName();    
                     
                     return org.springframework.security.core.userdetails.User.builder()
                         .username(user.getUsername())

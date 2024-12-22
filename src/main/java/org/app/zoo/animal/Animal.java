@@ -2,11 +2,17 @@ package org.app.zoo.animal;
 
 import java.sql.Date;
 
+import org.app.zoo.breed.Breed;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -14,64 +20,102 @@ import jakarta.validation.constraints.Size;
 public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id_animal", nullable = false)
     private int id_animal;
 
     @Size(min=3) //Name cannot be less than 3 characters
-    private String nombre;
+    @Column(name = "nombre", nullable = false)
+    private String name;
 
-    private int id_raza;
-    private int edad;
-    private double peso;
-    private Date fecha_ingreso;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_raza", nullable = false)
+    private Breed breed;
+
+    @Column(name = "edad", nullable = false)
+    private int age;
+
+    @Column(name = "peso", nullable = false)
+    private double weight;
+
+    @Column(name = "fecha_ingreso", nullable = false)
+    private Date entry_date;
 
     protected Animal(){}
 
-    public Animal(int id_animal, String nombre, int id_raza, int edad, double peso, Date fecha_ingreso) {
-        setId_animal(id_animal);
-        setNombre(nombre);
-        setId_raza(id_raza);
-        setEdad(edad);
-        setPeso(peso);
-        setDias_zoo(fecha_ingreso);
+    public Animal(int id_animal, String name, Breed breed, int age, double weight, Date entry_date) {
+        this.id_animal = id_animal;
+        this.name = name;
+        this.breed = breed;
+        this.age = age;
+        this.weight = weight;
+        this.entry_date = entry_date;
     }
 
 
     public int getId_animal() {
         return id_animal;
     }
+
+
     public void setId_animal(int id_animal) {
         this.id_animal = id_animal;
     }
-    public String getNombre() {
-        return nombre;
+
+
+    public String getName() {
+        return name;
     }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+
+
+    public void setName(String name) {
+        this.name = name;
     }
-    public int getId_raza() {
-        return id_raza;
+
+
+    public Breed getBreed() {
+        return breed;
     }
-    public void setId_raza(int id_raza) {
-        this.id_raza = id_raza;
+
+
+    public void setBreed(Breed breed) {
+        this.breed = breed;
     }
-    public int getEdad() {
-        return edad;
+
+
+    public int getAge() {
+        return age;
     }
-    public void setEdad(int edad) {
-        this.edad = edad;
+
+
+    public void setAge(int age) {
+        this.age = age;
     }
-    public double getPeso() {
-        return peso;
+
+
+    public double getWeight() {
+        return weight;
     }
-    public void setPeso(double peso) {
-        this.peso = peso;
+
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
-    public Date getDias_zoo() {
-        return fecha_ingreso;
+
+
+    public Date getEntry_date() {
+        return entry_date;
     }
-    public void setDias_zoo(Date fecha_ingreso) {
-        this.fecha_ingreso = fecha_ingreso;
+
+
+    public void setEntry_date(Date entry_date) {
+        this.entry_date = entry_date;
     }
+
+
+
+    
+
+    
 
     
 }

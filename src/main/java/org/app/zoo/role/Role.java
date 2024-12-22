@@ -14,31 +14,32 @@ import jakarta.persistence.Table;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_rol;
+    @Column(name = "id_rol", nullable = false)
+    private int id_role;
 
-    @Column(nullable = false, unique = true)
-    private String nombre;
+    @Column(name = "nombre", nullable = false, unique = true)
+    private String name;
 
     
 
     public Role(){}
 
-    public Role(int id_rol, String nombre) {
-        setId_rol(id_rol);
-        setNombre(nombre);
+    public Role(int id_role, String name) {
+        setId_role(id_role);
+        setName(name);
     }
 
-    public int getId_rol() {
-        return id_rol;
+    public int getId_role() {
+        return id_role;
     }
-    public void setId_rol(int id_rol) {
-        this.id_rol = id_rol;
+    public void setId_role(int id_role) {
+        this.id_role = id_role;
     }
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
     

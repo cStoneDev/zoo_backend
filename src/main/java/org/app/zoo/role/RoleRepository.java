@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 @Schema(description = "Role interface to interact with the DB")
 public interface RoleRepository extends JpaRepository<Role, Integer> {
-    Optional<Role> findByNombre(String nombre);
+    Optional<Role> findByName(String name);
 }

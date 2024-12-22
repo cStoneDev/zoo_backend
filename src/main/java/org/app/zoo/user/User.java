@@ -19,11 +19,12 @@ import jakarta.persistence.Table;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_usuario;
+    @Column(name = "id_usuario", nullable = false)
+    private int id_user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
-    private Role rol;
+    private Role role;
 
     @Column(name = "nombre_usuario", nullable = false)
     private String username;
@@ -33,25 +34,25 @@ public class User {
 
     public User(){}
 
-    public User(int id_usuario, Role rol, String username, String password) {
-        setId_usuario(id_usuario);
-        setRol(rol);
+    public User(int id_user, Role role, String username, String password) {
+        setId_user(id_user);
+        setRole(role);
         setUsername(username);
         setPassword(password);
     }
 
 
-    public int getId_usuario() {
-        return id_usuario;
+    public int getId_user() {
+        return id_user;
     }
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setId_user(int id_user) {
+        this.id_user = id_user;
     }
-    public Role getRol() {
-        return rol;
+    public Role getRole() {
+        return role;
     }
-    public void setRol(Role rol) {
-        this.rol = rol;
+    public void setRole(Role role) {
+        this.role = role;
     }
     public String getUsername() {
         return username;

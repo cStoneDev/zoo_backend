@@ -2,7 +2,6 @@ package org.app.zoo.role;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/roles")
 @Schema(description = "Role controller class to handle HTTP requests")
 public class RoleController {
-    @Autowired
+
     private final RoleService roleService;
 
     
