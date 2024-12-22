@@ -1,5 +1,6 @@
 package org.app.zoo.user;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,16 +51,20 @@ public class UserService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(user -> {
-                    String role = "ROLE_" + user.getRole().getName();    
-                    
-                    return org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(role)
-                        .build();
-                    })
-        .orElseThrow(() -> new UsernameNotFoundException("Usuario: " + username + " no encontrado"));
-    }
+    System.out.println("Buscando usuario: " + username); // Verifica si el nombre de usuario es correcto
+    
+    return userRepository.findByUsername(username)
+        .map(user -> {
+            return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword()) // Contraseña encriptada
+                .authorities(new ArrayList<>()) // Asigna roles si es necesario
+                .build();
+        })
+        .orElseThrow(() -> {
+            System.err.println("Usuario no encontrado: " + username); // Log si no se encuentra el usuario
+            return new UsernameNotFoundException("Usuario no encontrado: " + username);
+        });
+}
+
 }

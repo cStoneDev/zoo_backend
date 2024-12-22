@@ -2,7 +2,11 @@ package org.app.zoo.auth;
 
 public class AuthRequest {
     private String username;
+    
     private String password;
+
+    // Constructor sin argumentos
+    public AuthRequest() {}
 
     // Getters y setters
     public String getUsername() {
@@ -21,3 +25,5 @@ public class AuthRequest {
         this.password = password;
     }
 }
+
+
