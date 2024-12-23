@@ -1,0 +1,21 @@
+server:
+    port: 8080
+
+security:
+    jwt:
+        secret-key: McvbIKwPAVjhaweqweqwfnQWELlloPPPPczxawPQWRNcMCE56K1234QQWIOxsqjjfieYU0xQhI
+        expiration: 86400000 # un dia
+        refresh-token:
+            expiration: 604800000 # 7 dias
+spring:
+  application:
+    name: zoo_backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/refugio_animales
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
