@@ -1,21 +1,22 @@
 server:
-    port: 8080
+    port: ${MY_SERVER_PORT}
 
 security:
     jwt:
-        secret-key: McvbIKwPAVjhaweqweqwfnQWELlloPPPPczxawPQWRNcMCE56K1234QQWIOxsqjjfieYU0xQhI
-        expiration: 86400000 # un dia
+        secret-key: ${MY_JWT_SECRET_KEY}
+        expiration: ${MY_JWT_EXPIRATION}
         refresh-token:
-            expiration: 604800000 # 7 dias
+            expiration: ${MY_JWT_REFRESH_TOKEN_EXPIRATION}
+
 spring:
   application:
-    name: zoo_backend
+    name: ${MY_APPLICATION_NAME}
   datasource:
-    url: jdbc:postgresql://localhost:5432/refugio_animales
-    username: postgres
-    password: 1234
+    url: ${MY_DATASOURCE_URL}
+    username: ${MY_DATASOURCE_USERNAME}
+    password: ${MY_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: false
-    open-in-view: false
+      ddl-auto: ${MY_JPA_HIBERNATE_DDL_AUTO}
+    show-sql: ${MY_JPA_SHOW_SQL}
+    open-in-view: ${MY_JPA_OPEN_IN_VIEW}
