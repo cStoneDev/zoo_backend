@@ -73,20 +73,26 @@ public class AnimalService {
 
         Specification<Animal> spec = Specification.where(null);
 
-    // Aplicar cada filtro si es válido
-    if (criteria.breedId() > 0) {
-        spec = spec.and(AnimalSpecification.filterByBreed(criteria.breedId()));
-    }
-    if (criteria.minAge() > 0 && criteria.maxAge() > 0 && criteria.minAge() <= criteria.maxAge()) {
-        spec = spec.and(AnimalSpecification.filterByAge(criteria.minAge(), criteria.maxAge()));
-    }
-    if (criteria.minDaysInShelter() > 0 && criteria.maxDaysInShelter() > 0 
-        && criteria.minDaysInShelter() <= criteria.maxDaysInShelter()) {
-        spec = spec.and(AnimalSpecification.filterByDaysInShelter(criteria.minDaysInShelter(), criteria.maxDaysInShelter()));
-    }
-    if (criteria.minWeight() > 0 && criteria.maxWeight() > 0 && criteria.minWeight() <= criteria.maxWeight()) {
-        spec = spec.and(AnimalSpecification.filterByWeight(criteria.minWeight(), criteria.maxWeight()));
-    }
+        // Aplicar cada filtro si es válido
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+            spec = spec.and(AnimalSpecification.filterBySearchField(criteria.searchField()));
+        }
+        if (criteria.breedId() > 0) {
+            spec = spec.and(AnimalSpecification.filterByBreed(criteria.breedId()));
+        }
+        if (criteria.speciesId() > 0){
+            spec = spec.and(AnimalSpecification.filterBySpecies(criteria.speciesId()));
+        }
+        if (criteria.minAge() > 0 && criteria.maxAge() > 0 && criteria.minAge() <= criteria.maxAge()) {
+            spec = spec.and(AnimalSpecification.filterByAge(criteria.minAge(), criteria.maxAge()));
+        }
+        if (criteria.minDaysInShelter() > 0 && criteria.maxDaysInShelter() > 0 
+            && criteria.minDaysInShelter() <= criteria.maxDaysInShelter()) {
+            spec = spec.and(AnimalSpecification.filterByDaysInShelter(criteria.minDaysInShelter(), criteria.maxDaysInShelter()));
+        }
+        if (criteria.minWeight() > 0 && criteria.maxWeight() > 0 && criteria.minWeight() <= criteria.maxWeight()) {
+            spec = spec.and(AnimalSpecification.filterByWeight(criteria.minWeight(), criteria.maxWeight()));
+        }
 
 
         // Obtener la lista de animales según la especificación
