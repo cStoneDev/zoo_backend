@@ -10,4 +10,8 @@ import java.util.Optional;
 @Schema(description = "User interface to interact with the DB")
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByResetToken(String resetToken);
 }

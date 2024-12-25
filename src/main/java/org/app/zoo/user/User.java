@@ -14,6 +14,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+
 import org.app.zoo.auth.repository.Token;
 
 @Entity
@@ -24,6 +26,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario", nullable = false)
     private Long id;
+
+    @Column(name = "correo_electronico")
+    private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_rol", nullable = false)
@@ -37,6 +42,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Token> tokens;
+
+    private String resetToken;
 
     public User(){}
 
@@ -59,6 +66,23 @@ public class User {
     public void setId_user(Long id_user) {
         this.id = id_user;
     }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Role getRole() {
         return role;
     }

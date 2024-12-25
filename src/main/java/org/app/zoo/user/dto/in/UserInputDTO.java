@@ -1,8 +1,13 @@
 package org.app.zoo.user.dto.in;
 
+import jakarta.validation.constraints.Email;
+
 public class UserInputDTO {
     private String username;
     private String password;
+
+    @Email
+    private String email;
     private int roleId;
 
     // Getters and Setters
@@ -12,6 +17,14 @@ public class UserInputDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

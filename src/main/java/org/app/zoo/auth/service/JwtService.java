@@ -1,6 +1,7 @@
 package org.app.zoo.auth.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -51,6 +53,27 @@ public class JwtService {
 
     public String generateRefreshToken(final User user){
         return buildToken(user, refreshExpiration);
+    }
+
+    public String generateResetPasswordToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "reset_password");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean isResetPasswordToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return "reset_password".equals(claims.get("type"));
     }
 
     private String buildToken(final User user, final long expiration){
