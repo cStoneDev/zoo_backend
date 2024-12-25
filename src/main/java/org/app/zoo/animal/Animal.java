@@ -21,7 +21,7 @@ public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_animal", nullable = false)
-    private int id_animal;
+    private int id;
 
     @Size(min=3) //Name cannot be less than 3 characters
     @Column(name = "nombre", nullable = false)
@@ -43,7 +43,7 @@ public class Animal {
     protected Animal(){}
 
     public Animal(int id_animal, String name, Breed breed, int age, double weight, Date entry_date) {
-        this.id_animal = id_animal;
+        this.id = id_animal;
         this.name = name;
         this.breed = breed;
         this.age = age;
@@ -53,12 +53,12 @@ public class Animal {
 
 
     public int getId_animal() {
-        return id_animal;
+        return id;
     }
 
 
     public void setId_animal(int id_animal) {
-        this.id_animal = id_animal;
+        this.id = id_animal;
     }
 
 

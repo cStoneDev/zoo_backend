@@ -1,14 +1,14 @@
 package org.app.zoo.animal;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.app.zoo.animal.dto.in.AnimalInputDTO;
 import org.app.zoo.animal.dto.out.AnimalOutputDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,12 +33,15 @@ public class AnimalController {
     }
 
     @GetMapping //it's called when /animals receives a GET request
-    public List<AnimalOutputDTO> getAllAnimals(){
-        return animalService.getAllAnimals();
+    public Page<AnimalOutputDTO> getAllAnimals(
+        @RequestParam(defaultValue = "0") int pageNumber,
+        @RequestParam(defaultValue = "10") int pageSize
+    ){
+        return animalService.getAllAnimals(pageNumber, pageSize);
     }
     
     @PostMapping("/search")
-    public ResponseEntity<List<AnimalOutputDTO>> searchAnimals(@RequestBody AnimalSearchCriteria animalSearchCriteria) {
+    public ResponseEntity<Page<AnimalOutputDTO>> searchAnimals(@RequestBody AnimalSearchCriteria animalSearchCriteria) {
         
         return new ResponseEntity<>(animalService.searchAnimals(animalSearchCriteria) , HttpStatus.OK);
         

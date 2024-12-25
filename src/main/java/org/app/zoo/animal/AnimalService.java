@@ -2,15 +2,18 @@ package org.app.zoo.animal;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.app.zoo.animal.dto.in.AnimalInputDTO;
 import org.app.zoo.animal.dto.out.AnimalOutputDTO;
 import org.app.zoo.breed.Breed;
 import org.app.zoo.breed.BreedRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -48,10 +51,14 @@ public class AnimalService {
         return mapToOutputDTO(savedAnimal);
     }
 
-    public List<AnimalOutputDTO> getAllAnimals() {
-        return animalRepository.findAll().stream()
-                .map(this::mapToOutputDTO)
-                .collect(Collectors.toList());
+    public Page<AnimalOutputDTO> getAllAnimals(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
+    
+        // Obtener la lista de animales según la paginación
+        Page<Animal> animalsPage = animalRepository.findAll(pageable);
+    
+        // Convertir a DTOs
+        return animalsPage.map(this::mapToOutputDTO);
     }
 
     private AnimalOutputDTO mapToOutputDTO(Animal animal) {
@@ -68,7 +75,7 @@ public class AnimalService {
         return animalOutputDTO;
     }
 
-    public List<AnimalOutputDTO> searchAnimals(AnimalSearchCriteria criteria) {
+    public Page<AnimalOutputDTO> searchAnimals(AnimalSearchCriteria criteria) {
         // Todo esta validado en animalSpecification
 
         Specification<Animal> spec = Specification.where(null);
@@ -94,14 +101,14 @@ public class AnimalService {
             spec = spec.and(AnimalSpecification.filterByWeight(criteria.minWeight(), criteria.maxWeight()));
         }
 
-
-        // Obtener la lista de animales según la especificación
-        List<Animal> animals = animalRepository.findAll(spec);
-
+        // Crear un objeto Pageable usando pageNumber y itemsPerPage
+        Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
+        
+        // Obtener la lista de animales según la especificación y la paginación
+        Page<Animal> animalsPage = animalRepository.findAll(spec, pageable);
+        
         // Convertir a DTOs
-        return animals.stream()
-        .map(this::mapToOutputDTO)
-        .collect(Collectors.toList());
-        }
+        return animalsPage.map(this::mapToOutputDTO);
+    }
 }
 

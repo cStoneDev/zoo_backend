@@ -9,6 +9,8 @@ public record AnimalSearchCriteria(
     double minWeight,
     double maxWeight,
     int minDaysInShelter,
-    int maxDaysInShelter
+    int maxDaysInShelter,
+    int pageNumber, // Número de página
+    int itemsPerPage // Tamaño de la página
 ) {
 }
