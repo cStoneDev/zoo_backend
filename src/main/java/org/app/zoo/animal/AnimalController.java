@@ -37,5 +37,11 @@ public class AnimalController {
         return animalService.getAllAnimals();
     }
     
+    @PostMapping("/search")
+    public ResponseEntity<List<AnimalOutputDTO>> searchAnimals(@RequestBody AnimalSearchCriteria animalSearchCriteria) {
+        
+        return new ResponseEntity<>(animalService.searchAnimals(animalSearchCriteria) , HttpStatus.OK);
+        
+    }
     
 }

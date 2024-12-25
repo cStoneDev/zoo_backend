@@ -9,6 +9,7 @@ import org.app.zoo.animal.dto.in.AnimalInputDTO;
 import org.app.zoo.animal.dto.out.AnimalOutputDTO;
 import org.app.zoo.breed.Breed;
 import org.app.zoo.breed.BreedRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -66,4 +67,35 @@ public class AnimalService {
         animalOutputDTO.setEntryDate(animal.getEntry_date());
         return animalOutputDTO;
     }
+
+    public List<AnimalOutputDTO> searchAnimals(AnimalSearchCriteria criteria) {
+        // Todo esta validado en animalSpecification
+
+        Specification<Animal> spec = Specification.where(null);
+
+    // Aplicar cada filtro si es válido
+    if (criteria.breedId() > 0) {
+        spec = spec.and(AnimalSpecification.filterByBreed(criteria.breedId()));
+    }
+    if (criteria.minAge() > 0 && criteria.maxAge() > 0 && criteria.minAge() <= criteria.maxAge()) {
+        spec = spec.and(AnimalSpecification.filterByAge(criteria.minAge(), criteria.maxAge()));
+    }
+    if (criteria.minDaysInShelter() > 0 && criteria.maxDaysInShelter() > 0 
+        && criteria.minDaysInShelter() <= criteria.maxDaysInShelter()) {
+        spec = spec.and(AnimalSpecification.filterByDaysInShelter(criteria.minDaysInShelter(), criteria.maxDaysInShelter()));
+    }
+    if (criteria.minWeight() > 0 && criteria.maxWeight() > 0 && criteria.minWeight() <= criteria.maxWeight()) {
+        spec = spec.and(AnimalSpecification.filterByWeight(criteria.minWeight(), criteria.maxWeight()));
+    }
+
+
+        // Obtener la lista de animales según la especificación
+        List<Animal> animals = animalRepository.findAll(spec);
+
+        // Convertir a DTOs
+        return animals.stream()
+        .map(this::mapToOutputDTO)
+        .collect(Collectors.toList());
+        }
 }
+
