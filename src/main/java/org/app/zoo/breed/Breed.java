@@ -38,6 +38,11 @@ public class Breed {
         this.species = species;
     }
 
+    public Breed(String name, Species species) {
+        this.name = name;
+        this.species = species;
+    }
+
     public int getId_breed() {
         return id;
     }
