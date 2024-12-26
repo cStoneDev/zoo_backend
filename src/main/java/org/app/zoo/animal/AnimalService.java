@@ -7,12 +7,14 @@ import org.app.zoo.animal.dto.in.AnimalInputDTO;
 import org.app.zoo.animal.dto.out.AnimalOutputDTO;
 import org.app.zoo.breed.Breed;
 import org.app.zoo.breed.BreedRepository;
+import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
+import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
 import org.app.zoo.config.errorHandling.ResourceNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -118,6 +120,78 @@ public class AnimalService {
         
         // Convertir a DTOs
         return animalsPage.map(this::mapToOutputDTO);
+    }
+
+
+
+    public void deleteAnimal(int id) {
+        // Verificar si la raza existe
+        Animal animal = animalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Animal no encontrado"));
+
+        try {
+            animalRepository.delete(animal);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException("No se puede eliminar el animal porque tiene dependencias relacionadas.");
+        }
+    }
+
+    public AnimalOutputDTO findById(int id) {
+        return mapToOutputDTO(animalRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Animal no encontrado")));
+    }
+
+    public AnimalOutputDTO updateAnimal(int id, AnimalInputDTO updatedAnimal) {
+        // Verificar si el animal existe
+        Animal animal = animalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Animal no encontrado"));
+    
+        // Validar que el nombre no esté vacío
+        if (updatedAnimal.name() == null || updatedAnimal.name().isEmpty()) {
+            throw new InvalidInputException("El nombre del animal no puede estar vacío");
+        }
+    
+        // Validar que la edad sea un valor razonable
+        if (updatedAnimal.age() < 0) {
+            throw new InvalidInputException("La edad del animal no puede ser negativa");
+        }
+    
+        // Validar que el peso sea un valor razonable
+        if (updatedAnimal.weight() < 0) {
+            throw new InvalidInputException("El peso del animal no puede ser negativo");
+        }
+    
+        // Validar que la fecha de entrada sea válida (no futura)
+        if (updatedAnimal.entryDate().after(new java.util.Date())) {
+            throw new InvalidInputException("La fecha de entrada no puede estar en el futuro");
+        }
+    
+        // Verificar si ya existe un animal con las mismas características
+        boolean exists = animalRepository.existsByNameAndAgeAndWeightAndBreedIdAndEntryDate(
+                updatedAnimal.name(), 
+                updatedAnimal.age(), 
+                updatedAnimal.weight(), 
+                updatedAnimal.breedId(), 
+                updatedAnimal.entryDate()
+        );
+    
+        if (exists) {
+            throw new ResourceAlreadyExistsException("Ya existe un animal con las mismas características.");
+        }
+    
+        // Validar que la raza con el ID proporcionado exista
+        Breed breed = breedRepository.findById(updatedAnimal.breedId())
+                .orElseThrow(() -> new ResourceNotFoundException("Raza no encontrada con el ID: " + updatedAnimal.breedId()));
+    
+        // Actualizar los valores del animal
+        animal.setName(updatedAnimal.name());
+        animal.setAge(updatedAnimal.age());
+        animal.setWeight(updatedAnimal.weight());
+        animal.setBreed(breed);  // Actualizamos la raza
+        animal.setEntry_date(updatedAnimal.entryDate());  // Actualizamos la fecha de entrada
+    
+        // Guardar y devolver el animal actualizado
+        return mapToOutputDTO(animalRepository.save(animal));
     }
 }
 
