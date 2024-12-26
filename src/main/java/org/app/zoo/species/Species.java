@@ -25,6 +25,10 @@ public class Species {
         this.name = name;
     }
 
+    public Species(String name) {
+        this.name = name;
+    }
+
     public Species() {
     }
     
