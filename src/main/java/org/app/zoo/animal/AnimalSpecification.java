@@ -22,7 +22,7 @@ public class AnimalSpecification {
             predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("breed").get("name")), "%" + searchField.toLowerCase() + "%"));
 
             // Filtro por nombre de especie
-            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("breed").get("specie").get("name")), "%" + searchField.toLowerCase() + "%"));
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("breed").get("species").get("name")), "%" + searchField.toLowerCase() + "%"));
 
             // Intentar agregar un filtro por edad
             try {
@@ -43,7 +43,7 @@ public class AnimalSpecification {
             // Intentar agregar un filtro por fecha de ingreso
             try {
                 java.sql.Date entryDateValue = java.sql.Date.valueOf(searchField);
-                predicates.add(criteriaBuilder.equal(root.get("entry_date"), entryDateValue));
+                predicates.add(criteriaBuilder.equal(root.get("entryDate"), entryDateValue));
             } catch (IllegalArgumentException e) {
                 // Ignorar si no es una fecha válida
             }
@@ -57,7 +57,7 @@ public class AnimalSpecification {
         return (root, query, criteriaBuilder) -> {
 
             // Filtrar por el ID de la raza
-            return criteriaBuilder.equal(root.get("breed").get("id_breed"), breedId);
+            return criteriaBuilder.equal(root.get("breed").get("id"), breedId);
         };
     }
 
@@ -65,7 +65,7 @@ public class AnimalSpecification {
         return (root, query, criteriaBuilder) -> {
 
             // Filtrar por el ID de la raza
-            return criteriaBuilder.equal(root.get("breed").get("specie").get("id_specie"), speciesId);
+            return criteriaBuilder.equal(root.get("breed").get("species").get("id"), speciesId);
         };
     }
     
@@ -96,7 +96,7 @@ public class AnimalSpecification {
             Date maxDateConverted = Date.from(maxDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
             // Filtrar por el rango de fechas
-            return criteriaBuilder.between(root.get("entry_date"), minDateConverted, maxDateConverted);
+            return criteriaBuilder.between(root.get("entryDate"), minDateConverted, maxDateConverted);
         };
     }
 

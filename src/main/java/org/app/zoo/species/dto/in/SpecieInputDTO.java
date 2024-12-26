@@ -1,4 +1,4 @@
-package org.app.zoo.specie.dto.in;
+package org.app.zoo.species.dto.in;
 
 public class SpecieInputDTO {
     private String name;

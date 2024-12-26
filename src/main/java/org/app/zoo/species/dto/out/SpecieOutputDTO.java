@@ -1,4 +1,4 @@
-package org.app.zoo.specie.dto.out;
+package org.app.zoo.species.dto.out;
 
 public class SpecieOutputDTO {
     private int id;

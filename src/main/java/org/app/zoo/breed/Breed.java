@@ -1,6 +1,6 @@
 package org.app.zoo.breed;
 
-import org.app.zoo.specie.Specie;
+import org.app.zoo.species.Species;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -20,30 +20,30 @@ public class Breed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_raza", nullable = false)
-    private int id_breed;
+    private int id;
 
     @Column(name = "nombre", nullable = false)
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_especie", nullable = false)
-    private Specie specie;
+    private Species species;
 
     public Breed() {
     }
 
-    public Breed(int id_breed, String name, Specie specie) {
-        this.id_breed = id_breed;
+    public Breed(int id, String name, Species species) {
+        this.id = id;
         this.name = name;
-        this.specie = specie;
+        this.species = species;
     }
 
     public int getId_breed() {
-        return id_breed;
+        return id;
     }
 
-    public void setId_breed(int id_breed) {
-        this.id_breed = id_breed;
+    public void setId_breed(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -54,11 +54,11 @@ public class Breed {
         this.name = name;
     }
 
-    public Specie getSpecie() {
-        return specie;
+    public Species getSpecies() {
+        return species;
     }
 
-    public void setSpecie(Specie specie) {
-        this.specie = specie;
+    public void setSpecies(Species species) {
+        this.species = species;
     }
 }

@@ -38,7 +38,7 @@ public class Animal {
     private double weight;
 
     @Column(name = "fecha_ingreso", nullable = false)
-    private Date entry_date;
+    private Date entryDate;
 
     protected Animal(){}
 
@@ -48,7 +48,7 @@ public class Animal {
         this.breed = breed;
         this.age = age;
         this.weight = weight;
-        this.entry_date = entry_date;
+        this.entryDate = entry_date;
     }
 
 
@@ -103,20 +103,13 @@ public class Animal {
 
 
     public Date getEntry_date() {
-        return entry_date;
+        return entryDate;
     }
 
 
     public void setEntry_date(Date entry_date) {
-        this.entry_date = entry_date;
+        this.entryDate = entry_date;
     }
-
-
-
-    
-
-    
-
     
 }
 

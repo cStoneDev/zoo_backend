@@ -1,4 +1,4 @@
-package org.app.zoo.specie;
+package org.app.zoo.species;
 
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Repository
-@Schema(description = "Specie interface to interact with the DB")
-public interface SpecieRepository extends JpaRepository<Specie, Integer> {
+@Schema(description = "Species interface to interact with the DB")
+public interface SpeciesRepository extends JpaRepository<Species, Integer> {
     Optional<Breed> findByName(String name);
 }

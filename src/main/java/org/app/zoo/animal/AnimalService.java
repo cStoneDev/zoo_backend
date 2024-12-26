@@ -7,6 +7,8 @@ import org.app.zoo.animal.dto.in.AnimalInputDTO;
 import org.app.zoo.animal.dto.out.AnimalOutputDTO;
 import org.app.zoo.breed.Breed;
 import org.app.zoo.breed.BreedRepository;
+import org.app.zoo.config.errorHandling.InvalidInputException;
+import org.app.zoo.config.errorHandling.ResourceNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -30,18 +32,24 @@ public class AnimalService {
     }
 
     public AnimalOutputDTO createAnimal(AnimalInputDTO animalInputDTO) {
-        Breed breed = breedRepository.findById(animalInputDTO.getBreedId())
-                .orElseThrow(() -> new RuntimeException("Breed not found"));
+        Breed breed = breedRepository.findById(animalInputDTO.breedId())
+                .orElseThrow(() -> new ResourceNotFoundException("Raza no encontrada"));
 
         Animal animal = new Animal();
-        animal.setName(animalInputDTO.getName());
-        animal.setAge(animalInputDTO.getAge());
-        animal.setWeight(animalInputDTO.getWeight());
+        if (animalInputDTO.name() == null || animalInputDTO.name().isEmpty()){
+            throw new InvalidInputException("El nombre del animal no puede estar vacío");
+        }
+        animal.setName(animalInputDTO.name());
+        // la edad puede o no tenerla
+        animal.setAge(animalInputDTO.age());
+        // el peso puede o no tenerlo
+        animal.setWeight(animalInputDTO.weight());
+        // breed ya validada
         animal.setBreed(breed);
 
         // Assign an entryDate if any
-        if (animalInputDTO.getEntryDate() != null) {
-            animal.setEntry_date(animalInputDTO.getEntryDate());
+        if (animalInputDTO.entryDate() != null) {
+            animal.setEntry_date(animalInputDTO.entryDate());
         } else {
             animal.setEntry_date(Date.valueOf(LocalDate.now())); // Fecha actual
         }
@@ -62,16 +70,17 @@ public class AnimalService {
     }
 
     private AnimalOutputDTO mapToOutputDTO(Animal animal) {
-        AnimalOutputDTO animalOutputDTO = new AnimalOutputDTO();
-        animalOutputDTO.setId(animal.getId_animal());
-        animalOutputDTO.setName(animal.getName());
-        animalOutputDTO.setAge(animal.getAge());
-        animalOutputDTO.setWeight(animal.getWeight());
-        animalOutputDTO.setBreedName(animal.getBreed().getName());
-        animalOutputDTO.setSpecieName(animal.getBreed().getSpecie().getName());
-        animalOutputDTO.setBreedId(animal.getBreed().getId_breed());
-        animalOutputDTO.setSpecieId(animal.getBreed().getSpecie().getId_specie());
-        animalOutputDTO.setEntryDate(animal.getEntry_date());
+        AnimalOutputDTO animalOutputDTO = new AnimalOutputDTO(
+            animal.getId_animal(),
+            animal.getName(),
+            animal.getAge(),
+            animal.getWeight(),
+            animal.getBreed().getName(),
+            animal.getBreed().getSpecies().getName(),
+            animal.getBreed().getId_breed(),
+            animal.getBreed().getSpecies().getId_species(),
+            animal.getEntry_date()
+        );
         return animalOutputDTO;
     }
 
