@@ -13,7 +13,7 @@ public class BreedSpecification {
 
             // Filtro por nombre
             predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + searchField.toLowerCase() + "%"));
-            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("species").get("name")),"%"+ searchField.toLowerCase() + "%"));
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("species").get("name")), "%" + searchField.toLowerCase() + "%"));
                 
             return criteriaBuilder.or(predicates.toArray(new Predicate[0])); // combinar múltiples condiciones (predicados) en una consulta.
         };
