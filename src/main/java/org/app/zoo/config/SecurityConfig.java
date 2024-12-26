@@ -1,5 +1,7 @@
 package org.app.zoo.config;
 
+import java.util.List;
+
 import org.app.zoo.auth.repository.Token;
 import org.app.zoo.auth.repository.TokenRepository;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -32,28 +37,42 @@ public class SecurityConfig {
 
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(req -> 
-            req.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/users/forgot-password", "/users/reset-password")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-        )
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout(logout -> 
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configurar CORS
+            .authorizeHttpRequests(req -> 
+                req.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/users/forgot-password", "/users/reset-password")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .logout(logout -> 
                 logout.logoutUrl("/auth/logout")
-                    .addLogoutHandler((request, response, authentication)-> {
+                    .addLogoutHandler((request, response, authentication) -> {
                         final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
                         logout(authHeader);
                     })
                     .logoutSuccessHandler((request, response, authentication) ->
                         SecurityContextHolder.clearContext())                
-        );
+            );
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern("http://localhost:5174"); // Permitir el origen de tu frontend
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Métodos permitidos
+        configuration.setAllowedHeaders(List.of("*")); // Permitir todos los encabezados
+        configuration.setAllowCredentials(true); // Permitir credenciales (cookies, etc.)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Aplicar configuración a todas las rutas
+        return source;
     }
 
     private void logout(final String token){
@@ -68,6 +87,8 @@ public class SecurityConfig {
         foundToken.setRevoked(true);
         tokenRepository.save(foundToken);
     }
+
+    
     
 
     /*@Bean

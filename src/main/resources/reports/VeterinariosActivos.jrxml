@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Coffee_Landscape" pageWidth="1191" pageHeight="842" orientation="Landscape" columnWidth="1151" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="src\reports\DataAdapter.jrdax"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="rgba(69, 98, 117, 0.78039217)" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#C3C5E6"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="provinciaParam" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[Select proveedor.nombre as "Veterinario", clinica.nombre AS "Clínica", provincia.nombre AS "Provincia",
+especialidad.nombre AS "Especialidad",
+proveedor.telefono AS "Teléfono",
+veterinario.fax AS "Fax",
+proveedor.email AS "Correo",
+veterinario.distancia_ciudad AS "Distancia a la ciudad más cercana",
+tiposervicio.descripcion AS "Tipo de servicio" from proveedor INNER JOIN veterinario using(id_proveedor) INNER JOIN especialidad using(id_especialidad) INNER JOIN
+clinica using(id_clinica) INNER JOIN provincia using(id_provincia) INNER JOIN tiposervicio using(id_tipo_servicio)
+WHERE 
+    (provincia.nombre = $P{provinciaParam} OR $P{provinciaParam}  IS NULL)]]>
+	</queryString>
+	<field name="Veterinario" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Veterinario"/>
+		<property name="com.jaspersoft.studio.field.label" value="Veterinario"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="proveedor"/>
+	</field>
+	<field name="Clínica" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Clínica"/>
+		<property name="com.jaspersoft.studio.field.label" value="Clínica"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="clinica"/>
+	</field>
+	<field name="Provincia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Provincia"/>
+		<property name="com.jaspersoft.studio.field.label" value="Provincia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="provincia"/>
+	</field>
+	<field name="Especialidad" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Especialidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="Especialidad"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="especialidad"/>
+	</field>
+	<field name="Teléfono" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Teléfono"/>
+		<property name="com.jaspersoft.studio.field.label" value="Teléfono"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="proveedor"/>
+	</field>
+	<field name="Fax" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Fax"/>
+		<property name="com.jaspersoft.studio.field.label" value="Fax"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="Correo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Correo"/>
+		<property name="com.jaspersoft.studio.field.label" value="Correo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="proveedor"/>
+	</field>
+	<field name="Distancia a la ciudad más cercana" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="Distancia a la ciudad más cercana"/>
+		<property name="com.jaspersoft.studio.field.label" value="Distancia a la ciudad más cercana"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="Tipo de servicio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Tipo de servicio"/>
+		<property name="com.jaspersoft.studio.field.label" value="Tipo de servicio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tiposervicio"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="139" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="354" y="0" width="442" height="62" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Veterinarios activos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="477" y="62" width="196" height="22" uuid="f6a78448-8260-4445-a9e0-e3fb53b080d9"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Zoológico "Fauna Viva"]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="16" width="1150" height="1" uuid="e9d2002a-c8ee-4649-a258-640dad29110c"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="1" y="0" width="100" height="16" uuid="f4022a0e-459f-43c1-b7ae-632974686b3b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ec04c887-82d9-49b0-b802-4ea196d6cd2f"/>
+				</reportElement>
+				<text><![CDATA[Veterinario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="100" height="16" uuid="4d49d67a-f385-48a7-b9f7-7cf7346b4b23">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ac5aba29-aba3-46d8-a98e-24d4f44647fc"/>
+				</reportElement>
+				<text><![CDATA[Clínica]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="0" width="100" height="16" uuid="2f0eb0bc-a74b-49ca-b510-c0df734323bc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="87e9248d-68b0-40de-a4f8-48ed65faa55c"/>
+				</reportElement>
+				<text><![CDATA[Provincia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="0" width="100" height="16" uuid="2d6ebc67-4455-4124-a1fe-c52ac3118774">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="270683b9-12ac-40b3-adbc-7a7eecd1ae26"/>
+				</reportElement>
+				<text><![CDATA[Especialidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="16" uuid="35672e96-2618-4ad4-a0fd-fd0b36801e4d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="735af67d-2df5-4aa5-bce5-13da07231af8"/>
+				</reportElement>
+				<text><![CDATA[Teléfono]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="570" y="0" width="100" height="16" uuid="65de5227-3c55-4749-be09-ed260823baa1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c66bbdc3-9d8b-4928-993c-6a4cdf7eca3f"/>
+				</reportElement>
+				<text><![CDATA[Fax]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="682" y="0" width="100" height="16" uuid="83781ebf-6358-4972-907a-5a5d41bbe894">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f8fea76-1f29-44b1-81c1-afa391626b0a"/>
+				</reportElement>
+				<text><![CDATA[Correo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="830" y="0" width="100" height="16" uuid="b14c79fd-8f7a-43fe-a398-5714a697574a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ba604682-688c-4bea-8c33-fc8ced999113"/>
+				</reportElement>
+				<text><![CDATA[Distancia a la ciudad más cercana]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="960" y="0" width="100" height="16" uuid="e546581a-4949-42a9-88af-0b9a34a0a5f4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a1d8337d-7424-41ea-a704-276a68dbede6"/>
+				</reportElement>
+				<text><![CDATA[Tipo de servicio]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<frame>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="1150" height="15" uuid="fa7cec56-4ec1-48e6-a26e-7266a995d174"/>
+				<textField>
+					<reportElement x="1" y="3" width="100" height="30" uuid="5f55bbe3-75ee-4b43-a440-07d4d3f993f7">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ec04c887-82d9-49b0-b802-4ea196d6cd2f"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Veterinario}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="110" y="5" width="100" height="30" uuid="b11be53c-46fb-4ca7-ad9d-ed801b211483">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ac5aba29-aba3-46d8-a98e-24d4f44647fc"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Clínica}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="230" y="5" width="100" height="30" uuid="d6a2e799-a3ba-4fa3-8550-d7c6b20472a6">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="87e9248d-68b0-40de-a4f8-48ed65faa55c"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Provincia}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="340" y="5" width="100" height="30" uuid="246ce528-edf5-45c0-9624-fe54cb146f51">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="270683b9-12ac-40b3-adbc-7a7eecd1ae26"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Especialidad}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="455" y="4" width="100" height="30" uuid="9b3ffde5-a102-4801-b61a-40a5676ffd46">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="735af67d-2df5-4aa5-bce5-13da07231af8"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Teléfono}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="570" y="4" width="100" height="30" uuid="5c98d6b7-939f-4306-8360-15c1e2385609">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c66bbdc3-9d8b-4928-993c-6a4cdf7eca3f"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Fax}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="682" y="6" width="100" height="30" uuid="0c75a3d8-e4e3-44fc-832f-75d46e0ebe8d">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f8fea76-1f29-44b1-81c1-afa391626b0a"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Correo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="830" y="5" width="100" height="30" uuid="8dd0ff81-6ce9-48a8-a48c-c04ccacadef0">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ba604682-688c-4bea-8c33-fc8ced999113"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Distancia a la ciudad más cercana}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="960" y="3" width="100" height="30" uuid="178bedfd-86b9-49f0-8206-2b7c7231bbea">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a1d8337d-7424-41ea-a704-276a68dbede6"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{Tipo de servicio}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="6" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="1150" height="1" uuid="fa5e88d5-a011-4e32-8f12-ce923f903111"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-21" y="1" width="1192" height="24" forecolor="#909BD1" backcolor="#A0A3EB" uuid="5d8169bd-4a75-48c8-8a68-6d3ad5ba9402"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="1140" y="2" width="40" height="20" forecolor="#736343" uuid="e5e27efa-b599-499b-9ca3-848cb511cb7b"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="1060" y="2" width="80" height="20" forecolor="#736343" uuid="18cfe1ca-f7d6-48b0-9827-28578b42a5e0"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="22" y="1" width="197" height="20" forecolor="#736343" uuid="fbce24bb-3cb1-44a3-8eec-8c067ddbe5b5"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jdbcDataAdapter class="net.sf.jasperreports.data.jdbc.JdbcDataAdapterImpl">
+  <name>Zoo DB</name>
+  <driver>org.postgresql.Driver</driver>
+  <username>postgres</username>
+  <password>admin</password>
+  <url>jdbc:postgresql://localhost:5433/zoo</url>
+  <database></database>
+  <savePassword>true</savePassword>
+  <serverAddress></serverAddress>
+</jdbcDataAdapter>

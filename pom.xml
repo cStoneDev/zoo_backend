@@ -105,6 +105,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.20.3</version>
+		</dependency>
 
 	</dependencies>
 
@@ -119,11 +124,11 @@
 
 
 
-	
-		
-	
 
-	
-		
-	
+
+
+
+
+
+
 </project>
