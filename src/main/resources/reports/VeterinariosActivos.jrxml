@@ -86,12 +86,12 @@ WHERE
 	<title>
 		<band height="139" splitType="Stretch">
 			<staticText>
-				<reportElement style="Title" x="354" y="0" width="442" height="62" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd"/>
+				<reportElement style="Title" x="354" y="-10" width="486" height="72" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Veterinarios activos]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="SubTitle" x="477" y="62" width="196" height="22" uuid="f6a78448-8260-4445-a9e0-e3fb53b080d9"/>
+				<reportElement style="SubTitle" x="477" y="62" width="243" height="38" uuid="f6a78448-8260-4445-a9e0-e3fb53b080d9"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>

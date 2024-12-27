@@ -83,12 +83,12 @@ AND
 	<title>
 		<band height="139" splitType="Stretch">
 			<staticText>
-				<reportElement style="Title" x="255" y="0" width="641" height="62" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd"/>
+				<reportElement style="Title" x="255" y="-10" width="675" height="72" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Contratos con alimentadores]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="SubTitle" x="477" y="62" width="196" height="22" uuid="f6a78448-8260-4445-a9e0-e3fb53b080d9"/>
+				<reportElement style="SubTitle" x="477" y="62" width="233" height="38" uuid="f6a78448-8260-4445-a9e0-e3fb53b080d9"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
