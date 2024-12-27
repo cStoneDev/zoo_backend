@@ -19,7 +19,7 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "Details about an animal")
 public class Animal {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_animal", nullable = false)
     private int id;
 
