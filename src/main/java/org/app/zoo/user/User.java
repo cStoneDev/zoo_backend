@@ -30,7 +30,7 @@ public class User {
     @Column(name = "correo_electronico")
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
     private Role role;
 

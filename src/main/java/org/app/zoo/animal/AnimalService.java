@@ -125,7 +125,7 @@ public class AnimalService {
 
 
     public void deleteAnimal(int id) {
-        // Verificar si la raza existe
+
         Animal animal = animalRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Animal no encontrado"));
 

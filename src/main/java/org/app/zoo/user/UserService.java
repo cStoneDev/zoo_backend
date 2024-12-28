@@ -1,14 +1,25 @@
 package org.app.zoo.user;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.app.zoo.auth.service.JwtService;
+import org.app.zoo.config.errorHandling.ConstraintViolationException;
+import org.app.zoo.config.errorHandling.InvalidInputException;
+import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
+import org.app.zoo.config.errorHandling.ResourceNotFoundException;
 import org.app.zoo.email.service.EmailService;
 import org.app.zoo.role.Role;
 import org.app.zoo.role.RoleRepository;
+import org.app.zoo.user.dto.in.UserInputDTO;
+import org.app.zoo.user.dto.out.UserOutputDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,26 +49,105 @@ public class UserService implements UserDetailsService {
         this.jwtService = jwtService;
     }
 
-    public User createUser(User user) {
-        // Validación de existencia del rol
-        Role role = roleRepository.findByName(user.getRole().getName())
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
-
-        user.setRole(role);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    private void validate(UserInputDTO userInputDTO){
+        if (userInputDTO.email() == null || userInputDTO.email().trim().isEmpty()) {
+            throw new InvalidInputException("El email es inválido o vacío");
+        }
+        if (userInputDTO.username() == null || userInputDTO.username().length() < 3 || userInputDTO.username().isEmpty()) {
+            throw new InvalidInputException("El nombre del proveedor debe tener al menos 3 caracteres y no estar vacío");
+        }
     }
 
-    public Optional<User> findUserById(Integer id) {
-        return userRepository.findById(id);
+    public UserOutputDTO createUser(UserInputDTO userInputDTO) {
+        Role role = roleRepository.findById(userInputDTO.roleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado"));
+
+        validate(userInputDTO);
+        User user = new User();
+        user.setUsername(userInputDTO.username());
+        user.setEmail(userInputDTO.email());
+        user.setRole(role);
+        user.setPassword(passwordEncoder.encode(userInputDTO.password()));
+        User userOut = userRepository.save(user);
+        
+        return mapToOutputDTO(userOut);
+    }
+
+    public UserOutputDTO findUserById(Integer id) {
+        return mapToOutputDTO(userRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"))) ;
     }
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public UserOutputDTO updateUser(int id, UserInputDTO userInputDTO){
+        User user = userRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        validate(userInputDTO);
+        boolean exists = userRepository.existsByUsernameAndEmailAndRoleId(
+            userInputDTO.username(), 
+            userInputDTO.email(), 
+            userInputDTO.roleId()
+        );
+
+        if(exists){
+            throw new ResourceAlreadyExistsException("Ya existe un usuario con las mismas característictas");
+        }
+
+        Role role = roleRepository.findById(userInputDTO.roleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado"));
+
+        user.setUsername(userInputDTO.username());
+        user.setEmail(userInputDTO.email());
+        user.setRole(role);
+        User userOut = userRepository.save(user);
+        
+        return mapToOutputDTO(userOut);
+    }
+
+    public Page<UserOutputDTO> searchUsers(UserSearchCriteria criteria) {
+
+        Specification<User> spec = Specification.where(null);
+
+        // Aplicar cada filtro si es válido
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+            spec = spec.and(UserSpecification.filterBySearchField(criteria.searchField()));
+        }
+        if (criteria.roleId() > 0) {
+            spec = spec.and(UserSpecification.filterByRole(criteria.roleId()));
+        }
+
+        // Crear un objeto Pageable usando pageNumber y itemsPerPage
+        Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
+        
+        // Obtener la lista de animales según la especificación y la paginación
+        Page<User> usersPage = userRepository.findAll(spec, pageable);
+        
+        // Convertir a DTOs
+        return usersPage.map(this::mapToOutputDTO);
+    }
+
+    public Page<UserOutputDTO> getAllUsers(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
+    
+        
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        return userPage.map(this::mapToOutputDTO);
+    }
+
+    public void deleteUser(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        try {
+            userRepository.delete(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException("No se puede eliminar el usuario porque tiene dependencias relacionadas.");
+        }
     }
 
     @Override
@@ -103,6 +193,16 @@ public class UserService implements UserDetailsService {
     
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private UserOutputDTO mapToOutputDTO(User user){
+        UserOutputDTO userOutputDTO = new UserOutputDTO(
+            user.getId_user(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getRole().getName()
+        );
+        return userOutputDTO;
     }
 
 }
