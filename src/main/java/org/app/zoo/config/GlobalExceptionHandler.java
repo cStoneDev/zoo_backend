@@ -1,5 +1,8 @@
 package org.app.zoo.config;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.ErrorResponse;
 import org.app.zoo.config.errorHandling.InvalidInputException;
@@ -51,5 +54,19 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Un error inesperado ha ocurrido.");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public String extractErrorMessage(String errorMessage) {
+        // Definir la expresión regular para capturar el mensaje deseado
+        Pattern pattern = Pattern.compile("ERROR:.*?(\\n|$)");
+        Matcher matcher = pattern.matcher(errorMessage);
+    
+        if (matcher.find()) {
+            // Retornar el mensaje capturado sin el salto de línea
+            return matcher.group().trim();
+        }
+        
+        // Si no se encuentra un patrón, retornar el mensaje original
+        return errorMessage;
     }
 }
