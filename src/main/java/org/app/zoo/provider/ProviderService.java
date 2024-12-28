@@ -2,6 +2,7 @@ package org.app.zoo.provider;
 
 import org.app.zoo.clinic.Clinic;
 import org.app.zoo.clinic.ClinicRepository;
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -44,10 +45,12 @@ public class ProviderService {
     private VeterinarianService veterinarianService;
     private ClinicRepository clinicRepository;
     private SpecialityRepository specialityRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     protected final int veterinarianType = 1;
 
-    public ProviderService(ProviderRepository providerRepository,
+    public ProviderService(GlobalExceptionHandler globalExceptionHandler,
+            ProviderRepository providerRepository,
             ProvinceRepository provinceRepository,
             ProviderTypeRepository providerTypeRepository,
             ServiceTypeRepository serviceTypeRepository,
@@ -55,6 +58,7 @@ public class ProviderService {
             VeterinarianService veterinarianService,
             ClinicRepository clinicRepository,
             SpecialityRepository specialityRepository) {
+        this.globalExceptionHandler = globalExceptionHandler;
         this.providerRepository = providerRepository;
         this.provinceRepository = provinceRepository;
         this.providerTypeRepository = providerTypeRepository;
@@ -83,7 +87,13 @@ public class ProviderService {
         provider.setProviderType(providerType);
         provider.setProvince(province);
         provider.setServiceType(serviceType);
-        Provider providerOut = providerRepository.save(provider);
+        Provider providerOut = new Provider();
+        try {
+            providerOut = providerRepository.save(provider);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+        
 
         if (providerInputDTO.providerTypeId() == veterinarianType) {
             Clinic clinic = clinicRepository.findById(providerInputDTO.clinicId())
@@ -99,7 +109,13 @@ public class ProviderService {
             veterinarian.setFax(providerInputDTO.fax());
             veterinarian.setSpeciality(speciality);
             veterinarian.setCityDistance(providerInputDTO.cityDistance());
-            veterinarianRepository.save(veterinarian);
+
+            try {
+                veterinarianRepository.save(veterinarian);
+            } catch (Exception e) {
+                throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+            }
+            
         }
         return mapToOutputDTO(providerOut);
     }

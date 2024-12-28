@@ -157,13 +157,13 @@ public class ReportController {
     @Operation(summary = "Get active veterinarians report", description = "Generates a report based on the specified dates")
     @PostMapping("/report/active-veterinarians")
     public ResponseEntity<?> getActiveVetReport( 
-            @Parameter(description = "Active veterinarians input data: provinceName should be 'null' in case you wanna get all the provinces", required = true)
+            @Parameter(description = "Active veterinarians input data: provinceName should be null in case you wanna get all the provinces", required = true)
             @RequestBody ActiveVetInputDTO activeVetDTO){
 
         try {
             Map<String, Object> parameters = new HashMap<>();
             
-            if(activeVetDTO.provinceName().equals("null")){
+            if(activeVetDTO.provinceName() == null || activeVetDTO.provinceName().isEmpty()){
                 parameters.put("provinciaParam", null);
             }
             else{

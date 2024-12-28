@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.app.zoo.auth.service.JwtService;
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -36,12 +37,14 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     @Value("${mail.baseUrl}")
     private String baseUrl;
 
-    public UserService(UserRepository userRepository, EmailService emailService, RoleRepository roleRepository,
+    public UserService(GlobalExceptionHandler globalExceptionHandler, UserRepository userRepository, EmailService emailService, RoleRepository roleRepository,
             PasswordEncoder passwordEncoder, JwtService jwtService) {
+        this.globalExceptionHandler = globalExceptionHandler;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
@@ -63,14 +66,23 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado"));
 
         validate(userInputDTO);
+        if (userInputDTO.password() == null || userInputDTO.password().trim().isEmpty()) {
+            throw new InvalidInputException("La contraseña está vacía");
+        }
         User user = new User();
         user.setUsername(userInputDTO.username());
         user.setEmail(userInputDTO.email());
         user.setRole(role);
         user.setPassword(passwordEncoder.encode(userInputDTO.password()));
-        User userOut = userRepository.save(user);
         
-        return mapToOutputDTO(userOut);
+        
+        try {
+            User userOut = userRepository.save(user);
+            return mapToOutputDTO(userOut);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+        
     }
 
     public UserOutputDTO findUserById(Integer id) {
@@ -103,9 +115,14 @@ public class UserService implements UserDetailsService {
         user.setUsername(userInputDTO.username());
         user.setEmail(userInputDTO.email());
         user.setRole(role);
-        User userOut = userRepository.save(user);
+
+        try {
+            User userOut = userRepository.save(user);
+            return mapToOutputDTO(userOut);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
         
-        return mapToOutputDTO(userOut);
     }
 
     public Page<UserOutputDTO> searchUsers(UserSearchCriteria criteria) {
@@ -192,7 +209,12 @@ public class UserService implements UserDetailsService {
         }
     
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+        
     }
 
     private UserOutputDTO mapToOutputDTO(User user){

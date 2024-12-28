@@ -1,8 +1,8 @@
 package org.app.zoo.breed;
 
-
 import org.app.zoo.breed.dto.in.BreedInputDTO;
 import org.app.zoo.breed.dto.out.BreedOutputDTO;
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -22,32 +22,40 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Service
 @Schema(description = "Breed service who has the implementations of crud functions and more")
 public class BreedService {
-    
+
     private final BreedRepository breedRepository;
     private final SpeciesRepository speciesRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public BreedService(BreedRepository breedRepository, SpeciesRepository speciesRepository) {
+    public BreedService(GlobalExceptionHandler globalExceptionHandler, BreedRepository breedRepository,
+            SpeciesRepository speciesRepository) {
         this.breedRepository = breedRepository;
         this.speciesRepository = speciesRepository;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     public BreedOutputDTO createBreed(BreedInputDTO breed) {
         Species species = speciesRepository.findById(breed.speciesId())
-            .orElseThrow(() -> new ResourceNotFoundException("Especie no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Especie no encontrada"));
         Breed breedToSave = new Breed(
-            breed.name(), 
-            species);
-        breedRepository.save(breedToSave);
-        return mapToOutputDTO(breedToSave);
+                breed.name(),
+                species);
+
+        try {
+            breedRepository.save(breedToSave);
+            return mapToOutputDTO(breedToSave);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
     private BreedOutputDTO mapToOutputDTO(Breed breed) {
         BreedOutputDTO breedOutputDTO = new BreedOutputDTO(
-            breed.getId_breed(),
-            breed.getName(),
-            breed.getSpecies().getId_species(),
-            breed.getSpecies().getName()
-        );
+                breed.getId_breed(),
+                breed.getName(),
+                breed.getSpecies().getId_species(),
+                breed.getSpecies().getName());
         return breedOutputDTO;
     }
 
@@ -59,52 +67,58 @@ public class BreedService {
         try {
             breedRepository.delete(breed);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar la raza porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar la raza porque tiene dependencias relacionadas.");
         }
     }
 
     public BreedOutputDTO findById(int id) {
         return mapToOutputDTO(breedRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Raza no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Raza no encontrada")));
     }
 
     public BreedOutputDTO updateBreed(int id, BreedInputDTO updatedBreed) {
         // Verificar si la raza existe
         Breed breed = breedRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Raza no encontrada"));
-    
+
         // Validar que el nombre no esté vacío
         if (updatedBreed.name() == null || updatedBreed.name().isEmpty()) {
             throw new InvalidInputException("El nombre de la raza no puede estar vacío");
         }
-    
+
         // Validar que no exista otra raza con el mismo nombre
         boolean exists = breedRepository.existsByNameAndIdNot(updatedBreed.name(), id);
         if (exists) {
             throw new ResourceAlreadyExistsException("Ya existe una raza con el nombre: " + updatedBreed.name());
         }
-    
+
         // Validar que la especie con el ID proporcionado exista
         Species species = speciesRepository.findById(updatedBreed.speciesId())
-                .orElseThrow(() -> new ResourceNotFoundException("Especie no encontrada con el ID: " + updatedBreed.speciesId()));
-    
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Especie no encontrada con el ID: " + updatedBreed.speciesId()));
+
         // Actualizar los valores de la raza
         breed.setName(updatedBreed.name());
-        breed.setSpecies(species);  // Actualizamos la especie
-    
-        // Guardar y devolver la raza actualizada
-        breedRepository.save(breed);
-        return mapToOutputDTO(breed);
-    }
-    
+        breed.setSpecies(species); // Actualizamos la especie
 
+        // Guardar y devolver la raza actualizada
+
+        try {
+            breedRepository.save(breed);
+            return mapToOutputDTO(breed);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
+    }
 
     public Page<BreedOutputDTO> getAllBreed(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<Breed> breedPage = breedRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return breedPage.map(this::mapToOutputDTO);
     }
@@ -115,15 +129,15 @@ public class BreedService {
         Specification<Breed> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(BreedSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<Breed> breedPage = breedRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return breedPage.map(this::mapToOutputDTO);
     }

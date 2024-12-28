@@ -1,5 +1,6 @@
 package org.app.zoo.species;
 
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -21,18 +22,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class SpeciesService {
 
     private final SpeciesRepository speciesRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public SpeciesService(SpeciesRepository speciesRepository) {
+    public SpeciesService(GlobalExceptionHandler globalExceptionHandler, SpeciesRepository speciesRepository) {
+        this.globalExceptionHandler = globalExceptionHandler;
         this.speciesRepository = speciesRepository;
     }
 
     public SpeciesOutputDTO createSpecies(SpeciesInputDTO species) {
-        if (species.name() == null || species.name().isEmpty()){
+        if (species.name() == null || species.name().isEmpty()) {
             throw new InvalidInputException("El nombre de la especie no puede estar vacío");
         }
         Species speciesSave = new Species(species.name());
-        speciesRepository.save(speciesSave);
-        return mapToOutputDTO(speciesSave);
+
+        try {
+            speciesRepository.save(speciesSave);
+            return mapToOutputDTO(speciesSave);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
     public void deleteSpecies(int id) {
@@ -43,13 +52,14 @@ public class SpeciesService {
         try {
             speciesRepository.delete(species);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar la especie porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar la especie porque tiene dependencias relacionadas.");
         }
     }
 
     public SpeciesOutputDTO findById(int id) {
         return mapToOutputDTO(speciesRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Especie no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Especie no encontrada")));
     }
 
     public SpeciesOutputDTO updateSpecies(int id, SpeciesInputDTO updatedSpecies) {
@@ -73,29 +83,32 @@ public class SpeciesService {
         // (Actualizar otros campos según corresponda)
 
         // Guardar y devolver la especie actualizada
-        speciesRepository.save(species);
-        return mapToOutputDTO(species);
-    }
 
+        try {
+            speciesRepository.save(species);
+            return mapToOutputDTO(species);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
+    }
 
     public Page<SpeciesOutputDTO> getAllSpecies(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<Species> speciesPage = speciesRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return speciesPage.map(this::mapToOutputDTO);
     }
 
     private SpeciesOutputDTO mapToOutputDTO(Species species) {
         SpeciesOutputDTO speciesOutputDTO = new SpeciesOutputDTO(
-            species.getId_species(),
-            species.getName()
-        );
+                species.getId_species(),
+                species.getName());
         return speciesOutputDTO;
     }
-
 
     public Page<SpeciesOutputDTO> searchSpecies(SpeciesSearchCriteria criteria) {
         // Todo esta validado en speciesSpecification
@@ -103,15 +116,15 @@ public class SpeciesService {
         Specification<Species> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(SpeciesSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<Species> speciesPage = speciesRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return speciesPage.map(this::mapToOutputDTO);
     }

@@ -1,5 +1,6 @@
 package org.app.zoo.servicetype;
 
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -19,32 +20,44 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Service
 @Schema(description = "ServiceType service with de impl of CRUD functions")
 public class ServiceTypeService {
-    
+
     private final ServiceTypeRepository serviceTypeRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public ServiceTypeService(ServiceTypeRepository serviceTypeRepository){
+    public ServiceTypeService(GlobalExceptionHandler globalExceptionHandler,
+            ServiceTypeRepository serviceTypeRepository) {
         this.serviceTypeRepository = serviceTypeRepository;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
-
-    public ServiceTypeOutputDTO createServiceType(ServiceTypeInputDTO ServiceTypeInputDTO){
+    public ServiceTypeOutputDTO createServiceType(ServiceTypeInputDTO ServiceTypeInputDTO) {
+        if (ServiceTypeInputDTO.name() == null || ServiceTypeInputDTO.name().isEmpty()) {
+            throw new InvalidInputException("El nombre del servicio no puede estar vacío");
+        }
+        
         ServiceType serviceType = new ServiceType(ServiceTypeInputDTO.name());
-        ServiceType savedServiceType = serviceTypeRepository.save(serviceType);
-        return mapToOutputDTO(savedServiceType);
+
+        try {
+            ServiceType savedServiceType = serviceTypeRepository.save(serviceType);
+            return mapToOutputDTO(savedServiceType);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
-    private ServiceTypeOutputDTO mapToOutputDTO(ServiceType serviceType){
+    private ServiceTypeOutputDTO mapToOutputDTO(ServiceType serviceType) {
         return new ServiceTypeOutputDTO(
-            serviceType.getId(),
-            serviceType.getName());
+                serviceType.getId(),
+                serviceType.getName());
     }
 
     public Page<ServiceTypeOutputDTO> getAllServiceTypes(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<ServiceType> serviceTypePage = serviceTypeRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return serviceTypePage.map(this::mapToOutputDTO);
     }
@@ -55,15 +68,15 @@ public class ServiceTypeService {
         Specification<ServiceType> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(ServiceTypeSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<ServiceType> serviceTypePage = serviceTypeRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return serviceTypePage.map(this::mapToOutputDTO);
     }
@@ -76,13 +89,14 @@ public class ServiceTypeService {
         try {
             serviceTypeRepository.delete(serviceType);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar el tipo de servicio porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar el tipo de servicio porque tiene dependencias relacionadas.");
         }
     }
 
     public ServiceTypeOutputDTO findById(int id) {
         return mapToOutputDTO(serviceTypeRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Tipo de servicio no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Tipo de servicio no encontrada")));
     }
 
     public ServiceTypeOutputDTO updateServiceType(int id, ServiceTypeInputDTO updatedServiceType) {
@@ -98,7 +112,8 @@ public class ServiceTypeService {
         // Validar que no exista otra especie con el mismo nombre
         boolean exists = serviceTypeRepository.existsByNameAndIdNot(updatedServiceType.name(), id);
         if (exists) {
-            throw new ResourceAlreadyExistsException("Ya existe una especie con el nombre: " + updatedServiceType.name());
+            throw new ResourceAlreadyExistsException(
+                    "Ya existe una especie con el nombre: " + updatedServiceType.name());
         }
 
         // Actualizar los valores de el tipo de servicio
@@ -106,7 +121,13 @@ public class ServiceTypeService {
         // (Actualizar otros campos según corresponda)
 
         // Guardar y devolver el tipo de servicio actualizada
-        serviceTypeRepository.save(serviceType);
-        return mapToOutputDTO(serviceType);
+
+        try {
+            serviceTypeRepository.save(serviceType);
+            return mapToOutputDTO(serviceType);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 }

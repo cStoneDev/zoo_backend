@@ -1,5 +1,6 @@
 package org.app.zoo.providertype;
 
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -19,32 +20,43 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Service
 @Schema(description = "ProviderType service with de impl of CRUD functions")
 public class ProviderTypeService {
-    
+
     private final ProviderTypeRepository providerTypeRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public ProviderTypeService(ProviderTypeRepository providerTypeRepository){
+    public ProviderTypeService(GlobalExceptionHandler globalExceptionHandler,
+            ProviderTypeRepository providerTypeRepository) {
         this.providerTypeRepository = providerTypeRepository;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
-
-    public ProviderTypeOutputDTO createProviderType(ProviderTypeInputDTO providerTypeInputDTO){
+    public ProviderTypeOutputDTO createProviderType(ProviderTypeInputDTO providerTypeInputDTO) {
         ProviderType providerType = new ProviderType(providerTypeInputDTO.name());
-        ProviderType savedProviderType = providerTypeRepository.save(providerType);
-        return mapToOutputDTO(savedProviderType);
+        if (providerTypeInputDTO.name() == null || providerTypeInputDTO.name().isEmpty()) {
+            throw new InvalidInputException("El nombre de la provincia no puede estar vacío");
+        }
+
+        try {
+            ProviderType savedProviderType = providerTypeRepository.save(providerType);
+            return mapToOutputDTO(savedProviderType);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
-    private ProviderTypeOutputDTO mapToOutputDTO(ProviderType providerType){
+    private ProviderTypeOutputDTO mapToOutputDTO(ProviderType providerType) {
         return new ProviderTypeOutputDTO(
-            providerType.getId(),
-            providerType.getName());
+                providerType.getId(),
+                providerType.getName());
     }
 
     public Page<ProviderTypeOutputDTO> getAllProviderTypes(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<ProviderType> providerTypePage = providerTypeRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return providerTypePage.map(this::mapToOutputDTO);
     }
@@ -55,15 +67,15 @@ public class ProviderTypeService {
         Specification<ProviderType> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(ProviderTypeSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<ProviderType> providerTypePage = providerTypeRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return providerTypePage.map(this::mapToOutputDTO);
     }
@@ -76,13 +88,14 @@ public class ProviderTypeService {
         try {
             providerTypeRepository.delete(providerType);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar el tipo de proveedor porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar el tipo de proveedor porque tiene dependencias relacionadas.");
         }
     }
 
     public ProviderTypeOutputDTO findById(int id) {
         return mapToOutputDTO(providerTypeRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Tipo de proveedor no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Tipo de proveedor no encontrada")));
     }
 
     public ProviderTypeOutputDTO updateProviderType(int id, ProviderTypeInputDTO updatedProviderType) {
@@ -98,7 +111,8 @@ public class ProviderTypeService {
         // Validar que no exista otra especie con el mismo nombre
         boolean exists = providerTypeRepository.existsByNameAndIdNot(updatedProviderType.name(), id);
         if (exists) {
-            throw new ResourceAlreadyExistsException("Ya existe una especie con el nombre: " + updatedProviderType.name());
+            throw new ResourceAlreadyExistsException(
+                    "Ya existe una especie con el nombre: " + updatedProviderType.name());
         }
 
         // Actualizar los valores de el tipo de proveedor
@@ -106,7 +120,13 @@ public class ProviderTypeService {
         // (Actualizar otros campos según corresponda)
 
         // Guardar y devolver el tipo de proveedor actualizada
-        providerTypeRepository.save(providerType);
-        return mapToOutputDTO(providerType);
+
+        try {
+            providerTypeRepository.save(providerType);
+            return mapToOutputDTO(providerType);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 }

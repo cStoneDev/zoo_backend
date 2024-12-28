@@ -2,6 +2,7 @@ package org.app.zoo.clinic;
 
 import org.app.zoo.clinic.dto.in.ClinicInputDTO;
 import org.app.zoo.clinic.dto.out.ClinicOutputDTO;
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -21,18 +22,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class ClinicService {
 
     private final ClinicRepository clinicRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public ClinicService(ClinicRepository clinicRepository) {
+    public ClinicService(GlobalExceptionHandler globalExceptionHandler, ClinicRepository clinicRepository) {
         this.clinicRepository = clinicRepository;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     public ClinicOutputDTO createClinic(ClinicInputDTO clinic) {
-        if (clinic.name() == null || clinic.name().isEmpty()){
+        if (clinic.name() == null || clinic.name().isEmpty()) {
             throw new InvalidInputException("El nombre de la clinica no puede estar vacío");
         }
         Clinic clinicSave = new Clinic(clinic.name());
-        clinicRepository.save(clinicSave);
-        return mapToOutputDTO(clinicSave);
+
+        try {
+            clinicRepository.save(clinicSave);
+            return mapToOutputDTO(clinicSave);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
     public void deleteClinic(int id) {
@@ -43,13 +52,14 @@ public class ClinicService {
         try {
             clinicRepository.delete(clinic);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar la clinica porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar la clinica porque tiene dependencias relacionadas.");
         }
     }
 
     public ClinicOutputDTO findById(int id) {
         return mapToOutputDTO(clinicRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Clinica no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Clinica no encontrada")));
     }
 
     public ClinicOutputDTO updateClinic(int id, ClinicInputDTO updatedClinic) {
@@ -73,29 +83,32 @@ public class ClinicService {
         // (Actualizar otros campos según corresponda)
 
         // Guardar y devolver la clinica actualizada
-        clinicRepository.save(clinic);
-        return mapToOutputDTO(clinic);
-    }
 
+        try {
+            clinicRepository.save(clinic);
+            return mapToOutputDTO(clinic);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
+    }
 
     public Page<ClinicOutputDTO> getAllClinic(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<Clinic> clinicPage = clinicRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return clinicPage.map(this::mapToOutputDTO);
     }
 
     private ClinicOutputDTO mapToOutputDTO(Clinic clinic) {
         ClinicOutputDTO clinicOutputDTO = new ClinicOutputDTO(
-            clinic.getId(),
-            clinic.getName()
-        );
+                clinic.getId(),
+                clinic.getName());
         return clinicOutputDTO;
     }
-
 
     public Page<ClinicOutputDTO> searchClinic(ClinicSearchCriteria criteria) {
         // Todo esta validado en clinicSpecification
@@ -103,15 +116,15 @@ public class ClinicService {
         Specification<Clinic> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(ClinicSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<Clinic> clinicPage = clinicRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return clinicPage.map(this::mapToOutputDTO);
     }

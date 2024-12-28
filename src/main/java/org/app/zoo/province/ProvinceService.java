@@ -1,5 +1,6 @@
 package org.app.zoo.province;
 
+import org.app.zoo.config.GlobalExceptionHandler;
 import org.app.zoo.config.errorHandling.ConstraintViolationException;
 import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.app.zoo.config.errorHandling.ResourceAlreadyExistsException;
@@ -20,18 +21,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Province service who has the implementations of crud functions and more")
 public class ProvinceService {
     private final ProvinceRepository provinceRepository;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
-    public ProvinceService(ProvinceRepository provinceRepository) {
+    public ProvinceService(GlobalExceptionHandler globalExceptionHandler, ProvinceRepository provinceRepository) {
         this.provinceRepository = provinceRepository;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     public ProvinceOutputDTO createProvince(ProvinceInputDTO province) {
-        if (province.name() == null || province.name().isEmpty()){
+        if (province.name() == null || province.name().isEmpty()) {
             throw new InvalidInputException("El nombre de la provincia no puede estar vacío");
         }
         Province provinceSave = new Province(province.name());
-        provinceRepository.save(provinceSave);
-        return mapToOutputDTO(provinceSave);
+
+        try {
+            provinceRepository.save(provinceSave);
+            return mapToOutputDTO(provinceSave);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
     }
 
     public void deleteProvince(int id) {
@@ -42,13 +51,14 @@ public class ProvinceService {
         try {
             provinceRepository.delete(province);
         } catch (DataIntegrityViolationException e) {
-            throw new ConstraintViolationException("No se puede eliminar la provincia porque tiene dependencias relacionadas.");
+            throw new ConstraintViolationException(
+                    "No se puede eliminar la provincia porque tiene dependencias relacionadas.");
         }
     }
 
     public ProvinceOutputDTO findById(int id) {
         return mapToOutputDTO(provinceRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Provincia no encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Provincia no encontrada")));
     }
 
     public ProvinceOutputDTO updateProvince(int id, ProvinceInputDTO updatedProvince) {
@@ -64,7 +74,8 @@ public class ProvinceService {
         // Validar que no exista otra provincia con el mismo nombre
         boolean exists = provinceRepository.existsByNameAndIdNot(updatedProvince.name(), id);
         if (exists) {
-            throw new ResourceAlreadyExistsException("Ya existe una provincia con el nombre: " + updatedProvince.name());
+            throw new ResourceAlreadyExistsException(
+                    "Ya existe una provincia con el nombre: " + updatedProvince.name());
         }
 
         // Actualizar los valores de la provincia
@@ -72,29 +83,32 @@ public class ProvinceService {
         // (Actualizar otros campos según corresponda)
 
         // Guardar y devolver la provincia actualizada
-        provinceRepository.save(province);
-        return mapToOutputDTO(province);
-    }
 
+        try {
+            provinceRepository.save(province);
+            return mapToOutputDTO(province);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+
+    }
 
     public Page<ProvinceOutputDTO> getAllProvince(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id")); // Crear un objeto Pageable
-    
+
         // Obtener la lista de speciees según la paginación
         Page<Province> provincePage = provinceRepository.findAll(pageable);
-    
+
         // Convertir a DTOs
         return provincePage.map(this::mapToOutputDTO);
     }
 
     private ProvinceOutputDTO mapToOutputDTO(Province province) {
         ProvinceOutputDTO provinceOutputDTO = new ProvinceOutputDTO(
-            province.getId(),
-            province.getName()
-        );
+                province.getId(),
+                province.getName());
         return provinceOutputDTO;
     }
-
 
     public Page<ProvinceOutputDTO> searchProvince(ProvinceSearchCriteria criteria) {
         // Todo esta validado en provinceSpecification
@@ -102,15 +116,15 @@ public class ProvinceService {
         Specification<Province> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(ProvinceSpecification.filterBySearchField(criteria.searchField()));
         }
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de speciees según la especificación y la paginación
         Page<Province> provincePage = provinceRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return provincePage.map(this::mapToOutputDTO);
     }

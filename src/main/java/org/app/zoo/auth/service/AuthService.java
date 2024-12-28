@@ -3,6 +3,8 @@ package org.app.zoo.auth.service;
 import org.app.zoo.auth.controller.AuthRequest;
 import org.app.zoo.auth.controller.TokenResponse;
 import org.app.zoo.auth.repository.TokenRepository;
+import org.app.zoo.config.GlobalExceptionHandler;
+import org.app.zoo.config.errorHandling.InvalidInputException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,14 +22,16 @@ public class AuthService{
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     private final AuthenticationManager authenticationManager; // autentificar un usuario pasada una autentificacion
 
-    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, JwtService jwtService, AuthenticationManager authenticationManager){
+    public AuthService(GlobalExceptionHandler globalExceptionHandler, UserRepository userRepository, TokenRepository tokenRepository, JwtService jwtService, AuthenticationManager authenticationManager){
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     public TokenResponse authenticate(AuthRequest request){
@@ -48,7 +52,12 @@ public class AuthService{
 
     private void saveUserToken(User user, String jwtToken){
         var token = new Token(user, jwtToken, false, false);
-        tokenRepository.save(token);
+        try {
+            tokenRepository.save(token);
+        } catch (Exception e) {
+            throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+        }
+        
     }
 
     private void revokeAllUserTokens(final User user){
@@ -59,7 +68,13 @@ public class AuthService{
                 token.setExpired(true);
                 token.setRevoked(true);
             }
-            tokenRepository.saveAll(validUserTokens);
+            try {
+                tokenRepository.saveAll(validUserTokens);
+            } 
+            catch (Exception e) {
+                throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
+            }
+            
         }
     }
 
