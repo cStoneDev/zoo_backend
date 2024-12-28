@@ -27,4 +27,9 @@ public class DashboardController{
     public Map<String, Integer> getTopSpecies() {
         return dashboardService.getTopSpecies();
     }
+
+    @GetMapping("/activeContracts")
+    public Map<String, Integer> getActiveContractsStatistics() {
+        return dashboardService.getActiveContractsByProviderType();
+    }
 }

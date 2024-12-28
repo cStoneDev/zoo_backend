@@ -1,20 +1,24 @@
 package org.app.zoo.dashboard;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.app.zoo.animal.AnimalRepository;
+import org.app.zoo.contract.ContractRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DashboardService{
 
     private final AnimalRepository animalRepository;
+    private final ContractRepository contractRepository;
 
-    public DashboardService(AnimalRepository animalRepository){
+    public DashboardService(AnimalRepository animalRepository, ContractRepository contractRepository){
         this.animalRepository = animalRepository;
+        this.contractRepository = contractRepository;
     }
 
     public Map<String, Integer> getEntriesPerMonthByYear(int year) {
@@ -67,5 +71,19 @@ public class DashboardService{
         }
 
         return topSpeciesMap;
+    }
+
+
+    public Map<String, Integer> getActiveContractsByProviderType() {
+        List<Object[]> results = contractRepository.countActiveContractsByProviderType();
+        Map<String, Integer> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            String providerTypeName = (String) result[0];
+            int count = ((Long) result[1]).intValue();
+            statistics.put(providerTypeName, count);
+        }
+
+        return statistics;
     }
 }

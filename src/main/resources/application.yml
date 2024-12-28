@@ -13,6 +13,8 @@ mail:
 spring:
   application:
     name: ${MY_APPLICATION_NAME}
+  jackson:
+    time-zone: ${MY_TIME_ZONE}
   datasource:
     url: ${MY_DATASOURCE_URL}
     username: ${MY_DATASOURCE_USERNAME}
