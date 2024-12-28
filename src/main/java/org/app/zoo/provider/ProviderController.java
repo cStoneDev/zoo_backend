@@ -1,5 +1,6 @@
 package org.app.zoo.provider;
 
+
 import org.app.zoo.provider.dto.in.ProviderInputDTO;
 import org.app.zoo.provider.dto.out.ProviderResponseDTO;
 import org.springframework.data.domain.Page;
@@ -57,5 +58,12 @@ public class ProviderController {
     public ResponseEntity<Void> deleteProvider(@PathVariable int id) {
         providerService.deleteProvider(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<Page<ProviderResponseDTO>> searchProviders(@RequestBody ProviderSearchCriteria providerSearchCriteria) {
+        
+        return new ResponseEntity<>(providerService.searchProvider(providerSearchCriteria) , HttpStatus.OK);
+        
     }
 }

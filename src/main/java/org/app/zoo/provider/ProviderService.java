@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -211,6 +212,35 @@ public class ProviderService {
                     provider.getServiceType().getName(),
                     provider.getProviderType().getName());
         }
+    }
+
+    public Page<ProviderResponseDTO> searchProvider(ProviderSearchCriteria criteria) {
+        // Todo esta validado en animalSpecification
+
+        Specification<Provider> spec = Specification.where(null);
+
+        // Aplicar cada filtro si es válido
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+            spec = spec.and(ProviderSpecification.filterBySearchField(criteria.searchField()));
+        }
+        if (criteria.provinceId() > 0) {
+            spec = spec.and(ProviderSpecification.filterByProvince(criteria.provinceId()));
+        }
+        if (criteria.serviceTypeId() > 0){
+            spec = spec.and(ProviderSpecification.filterByServiceType(criteria.serviceTypeId()));
+        }
+        if (criteria.providerTypeId() > 0){
+            spec = spec.and(ProviderSpecification.filterByProviderType(criteria.providerTypeId()));
+        }
+
+        // Crear un objeto Pageable usando pageNumber y itemsPerPage
+        Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
+        
+        // Obtener la lista de animales según la especificación y la paginación
+        Page<Provider> providerPage = providerRepository.findAll(spec, pageable);
+        
+        // Convertir a DTOs
+        return providerPage.map(this::mapToOutputDTO);
     }
 
 }
