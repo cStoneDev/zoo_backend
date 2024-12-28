@@ -85,7 +85,7 @@ public class UserService implements UserDetailsService {
         
     }
 
-    public UserOutputDTO findUserById(Integer id) {
+    public UserOutputDTO findUserById(Long id) {
         return mapToOutputDTO(userRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"))) ;
     }
@@ -94,7 +94,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    public UserOutputDTO updateUser(int id, UserInputDTO userInputDTO){
+    public UserOutputDTO updateUser(Long id, UserInputDTO userInputDTO){
         User user = userRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
@@ -156,7 +156,7 @@ public class UserService implements UserDetailsService {
         return userPage.map(this::mapToOutputDTO);
     }
 
-    public void deleteUser(int id) {
+    public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 

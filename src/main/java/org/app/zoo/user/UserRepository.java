@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 @Schema(description = "User interface to interact with the DB")
-public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     Optional<User> findByUsername(String username);
 
     boolean existsByUsernameAndEmailAndRoleId(String username, String email, int roleId);

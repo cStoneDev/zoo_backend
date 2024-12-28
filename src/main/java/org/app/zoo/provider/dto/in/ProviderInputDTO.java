@@ -3,11 +3,8 @@ package org.app.zoo.provider.dto.in;
 public record ProviderInputDTO(
     String name,
     int provinceId,
-    String provinceName,
     int serviceTypeId,
-    String serviceTypeName,
     int providerTypeId,
-    String providerTypeName,
     String address,
     String phone,
     String email,
