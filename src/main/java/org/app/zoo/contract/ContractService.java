@@ -60,7 +60,7 @@ public class ContractService {
             throw new InvalidInputException("La fecha de conciliacion no puede estar vacia");
         }
 
-        if (contractInputDTO.description() == null || contractInputDTO.description().isEmpty()){
+        if (contractInputDTO.description() == null || contractInputDTO.description().trim().isEmpty()){
             throw new InvalidInputException("La descripcion no puede estar vacia");
         }
         
@@ -114,6 +114,10 @@ public class ContractService {
             spec = spec.and(ContractSpecification.filterBySearchField(criteria.searchField()));
         }
 
+        if (criteria.providerTypeId() > 0) {
+            spec = spec.and(ContractSpecification.filterByProviderTypeId(criteria.providerTypeId()));
+        }
+
         if (criteria.contractState() > 0) {
             if(criteria.contractState() == 1){ // activos
                 spec = spec.and(ContractSpecification.filterByActiveContracts());
@@ -143,7 +147,6 @@ public class ContractService {
 
 
     public void deleteContract(int id) {
-        // Verificar si la raza existe
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contrato no encontrado"));
 
