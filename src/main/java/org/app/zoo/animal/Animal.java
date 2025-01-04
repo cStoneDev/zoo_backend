@@ -1,10 +1,14 @@
 package org.app.zoo.animal;
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.app.zoo.breed.Breed;
+import org.app.zoo.programation.Programation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -39,6 +44,9 @@ public class Animal {
 
     @Column(name = "fecha_ingreso", nullable = false)
     private Date entryDate;
+
+    @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL)
+    private Set<Programation> programations = new HashSet<>();
 
     protected Animal(){}
 

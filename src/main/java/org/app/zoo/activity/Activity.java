@@ -2,10 +2,14 @@ package org.app.zoo.activity;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.app.zoo.contract.Contract;
+import org.app.zoo.programation.Programation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +18,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 
@@ -39,6 +44,9 @@ public class Activity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_contrato", nullable = false)
     private Contract contract;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
+    private Set<Programation> programations = new HashSet<>();
 
     public Activity() {
     }
