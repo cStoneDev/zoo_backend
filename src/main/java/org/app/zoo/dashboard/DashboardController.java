@@ -32,4 +32,10 @@ public class DashboardController{
     public Map<String, Integer> getActiveContractsStatistics() {
         return dashboardService.getActiveContractsByProviderType();
     }
+
+    @GetMapping("/monthActivities")
+    public Map<String, Integer>getActivitiesPerMonthByYear(
+        @RequestParam(defaultValue = "#{T(java.time.LocalDate).now().getYear()}") int year) {
+        return dashboardService.getActivitiesPerMonthByYear(year);
+    }
 }
