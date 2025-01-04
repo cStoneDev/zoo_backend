@@ -25,11 +25,11 @@ public class Programation{
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "activity_id", nullable = false)
+    @JoinColumn(name = "id_actividad", nullable = false)
     private Activity activity;
 
     @ManyToOne
-    @JoinColumn(name = "animal_id", nullable = false)
+    @JoinColumn(name = "id_animal", nullable = false)
     private Animal animal;
 
     public int getId() {
