@@ -1,6 +1,10 @@
 server:
     port: ${MY_SERVER_PORT}
 
+springdoc:
+  swagger-ui:
+    layout: BaseLayout
+  
 security:
     jwt:
         secret-key: ${MY_JWT_SECRET_KEY}
