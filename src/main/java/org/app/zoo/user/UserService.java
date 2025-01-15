@@ -222,7 +222,8 @@ public class UserService implements UserDetailsService {
             user.getId_user(),
             user.getUsername(),
             user.getEmail(),
-            user.getRole().getName()
+            user.getRole().getName(),
+            user.getRole().getId()
         );
         return userOutputDTO;
     }

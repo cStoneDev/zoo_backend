@@ -87,9 +87,11 @@ public class ProviderService {
         provider.setProviderType(providerType);
         provider.setProvince(province);
         provider.setServiceType(serviceType);
-        Provider providerOut = new Provider();
         try {
-            providerOut = providerRepository.save(provider);
+            if (providerInputDTO.providerTypeId() != veterinarianType) {
+                providerRepository.save(provider);
+            }
+            
         } catch (Exception e) {
             throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
         }
@@ -103,7 +105,8 @@ public class ProviderService {
 
             Veterinarian veterinarian = new Veterinarian();
 
-            veterinarian.setProvider(providerOut);
+            
+            veterinarian.setProvider(provider);
             veterinarian.setClinic(clinic);
             veterinarian.setFax(providerInputDTO.fax());
             veterinarian.setSpeciality(speciality);
@@ -116,7 +119,7 @@ public class ProviderService {
             }
 
         }
-        return mapToOutputDTO(providerOut);
+        return mapToOutputDTO(provider);
     }
 
     public ProviderResponseDTO createProvider(ProviderInputDTO providerInputDTO) {

@@ -7,6 +7,7 @@ public record UserOutputDTO(
     String username,
     @Email
     String email,
-    String roleName
+    String roleName,
+    int roleId
 ) {
 } 
