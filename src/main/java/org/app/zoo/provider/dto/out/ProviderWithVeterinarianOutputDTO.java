@@ -1,7 +1,5 @@
 package org.app.zoo.provider.dto.out;
 
-import org.app.zoo.veterinarian.dto.out.VeterinarianOutputDTO;
-
 public record ProviderWithVeterinarianOutputDTO(
     int id,
     String name,
@@ -15,6 +13,11 @@ public record ProviderWithVeterinarianOutputDTO(
     String provinceName,
     String serviceTypeName,
     String providerTypeName,
-    VeterinarianOutputDTO veterinarianOutputDTO
+    String fax,
+    double cityDistance,
+    int clinicId,
+    int specialityId,
+    String clinicName,
+    String specialityName
 ) implements ProviderResponseDTO{
 } 

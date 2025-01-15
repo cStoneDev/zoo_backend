@@ -93,7 +93,6 @@ public class ProviderService {
         } catch (Exception e) {
             throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
         }
-        
 
         if (providerInputDTO.providerTypeId() == veterinarianType) {
             Clinic clinic = clinicRepository.findById(providerInputDTO.clinicId())
@@ -115,7 +114,7 @@ public class ProviderService {
             } catch (Exception e) {
                 throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
             }
-            
+
         }
         return mapToOutputDTO(providerOut);
     }
@@ -153,7 +152,7 @@ public class ProviderService {
 
         boolean good = validateProviderInput(updatedInput);
 
-        if(good){
+        if (good) {
             throw new ResourceAlreadyExistsException("Ya existe un proveedor con las mismas características.");
         }
         ProviderResponseDTO response = assignProvider(provider, updatedInput);
@@ -162,7 +161,8 @@ public class ProviderService {
 
     private boolean validateProviderInput(ProviderInputDTO input) {
         if (input.name() == null || input.name().length() < 3 || input.name().isEmpty()) {
-            throw new InvalidInputException("El nombre del proveedor debe tener al menos 3 caracteres y no estar vacío");
+            throw new InvalidInputException(
+                    "El nombre del proveedor debe tener al menos 3 caracteres y no estar vacío");
         }
         if (input.phone() == null || input.phone().length() != 8 || input.phone().isEmpty()) {
             throw new InvalidInputException("El teléfono debe tener exactamente 8 caracteres y no estar vacío");
@@ -175,25 +175,24 @@ public class ProviderService {
         }
 
         boolean exists = false;
-        
-        exists = providerRepository.existsByNameAndProvinceIdAndServiceTypeIdAndProviderTypeIdAndEmailAndPhoneAndAddress(
-            input.name(), 
-            input.provinceId(), 
-            input.serviceTypeId(), 
-            input.providerTypeId(), 
-            input.email(), 
-            input.phone(), 
-            input.address()        
-        );
-        if(input.providerTypeId()==veterinarianType){
+
+        exists = providerRepository
+                .existsByNameAndProvinceIdAndServiceTypeIdAndProviderTypeIdAndEmailAndPhoneAndAddress(
+                        input.name(),
+                        input.provinceId(),
+                        input.serviceTypeId(),
+                        input.providerTypeId(),
+                        input.email(),
+                        input.phone(),
+                        input.address());
+        if (input.providerTypeId() == veterinarianType) {
             exists = veterinarianRepository.existsByFaxAndClinicIdAndSpecialityId(
-                input.fax(),
-                input.clinicId(), 
-                input.specialityId()
-                );
+                    input.fax(),
+                    input.clinicId(),
+                    input.specialityId());
         }
         return exists;
-    } 
+    }
 
     private ProviderResponseDTO mapToOutputDTO(Provider provider) {
         if (provider.getProviderType().getId() == veterinarianType) {
@@ -212,7 +211,12 @@ public class ProviderService {
                     provider.getProvince().getName(),
                     provider.getServiceType().getName(),
                     provider.getProviderType().getName(),
-                    veterinarianOutputDTO);
+                    veterinarianOutputDTO.fax(),
+                    veterinarianOutputDTO.cityDistance(),
+                    veterinarianOutputDTO.clinicId(),
+                    veterinarianOutputDTO.specialityId(),
+                    veterinarianOutputDTO.clinicName(),
+                    veterinarianOutputDTO.specialityName());
         } else {
             return new ProviderOutputDTO(
                     provider.getId(),
@@ -236,25 +240,25 @@ public class ProviderService {
         Specification<Provider> spec = Specification.where(null);
 
         // Aplicar cada filtro si es válido
-        if (criteria.searchField() != null && !criteria.searchField().isEmpty()){
+        if (criteria.searchField() != null && !criteria.searchField().isEmpty()) {
             spec = spec.and(ProviderSpecification.filterBySearchField(criteria.searchField()));
         }
         if (criteria.provinceId() > 0) {
             spec = spec.and(ProviderSpecification.filterByProvince(criteria.provinceId()));
         }
-        if (criteria.serviceTypeId() > 0){
+        if (criteria.serviceTypeId() > 0) {
             spec = spec.and(ProviderSpecification.filterByServiceType(criteria.serviceTypeId()));
         }
-        if (criteria.providerTypeId() > 0){
+        if (criteria.providerTypeId() > 0) {
             spec = spec.and(ProviderSpecification.filterByProviderType(criteria.providerTypeId()));
         }
 
         // Crear un objeto Pageable usando pageNumber y itemsPerPage
         Pageable pageable = PageRequest.of(criteria.pageNumber(), criteria.itemsPerPage(), Sort.by("id"));
-        
+
         // Obtener la lista de animales según la especificación y la paginación
         Page<Provider> providerPage = providerRepository.findAll(spec, pageable);
-        
+
         // Convertir a DTOs
         return providerPage.map(this::mapToOutputDTO);
     }
