@@ -195,13 +195,8 @@ public class ProviderService {
                         input.providerTypeId(),
                         input.email(),
                         input.phone(),
-                        input.address());
-        if (input.providerTypeId() == veterinarianType) {
-            exists = veterinarianRepository.existsByFaxAndClinicIdAndSpecialityId(
-                    input.fax(),
-                    input.clinicId(),
-                    input.specialityId());
-        }
+                        input.address()
+        );
         return exists;
     }
 
