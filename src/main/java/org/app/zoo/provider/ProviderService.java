@@ -1,5 +1,7 @@
 package org.app.zoo.provider;
 
+import java.util.Optional;
+
 import org.app.zoo.clinic.Clinic;
 import org.app.zoo.clinic.ClinicRepository;
 import org.app.zoo.config.GlobalExceptionHandler;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+
 @Service
 @Schema(description = "Provider service who has the implementations of crud functions and more")
 public class ProviderService {
@@ -46,7 +49,6 @@ public class ProviderService {
     private ClinicRepository clinicRepository;
     private SpecialityRepository specialityRepository;
     private final GlobalExceptionHandler globalExceptionHandler;
-
     protected final int veterinarianType = 1;
 
     public ProviderService(GlobalExceptionHandler globalExceptionHandler,
@@ -69,7 +71,7 @@ public class ProviderService {
         this.specialityRepository = specialityRepository;
     }
 
-    private ProviderResponseDTO assignProvider(Provider provider, ProviderInputDTO providerInputDTO) {
+    private ProviderResponseDTO assignProvider(Provider provider, ProviderInputDTO providerInputDTO, String type) {
         Province province = provinceRepository.findById(providerInputDTO.provinceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Provincia no encontrada"));
 
@@ -87,16 +89,19 @@ public class ProviderService {
         provider.setProviderType(providerType);
         provider.setProvince(province);
         provider.setServiceType(serviceType);
+
+        Provider providerOut = new Provider();
         try {
-            if (providerInputDTO.providerTypeId() != veterinarianType) {
-                providerRepository.save(provider);
+            if (type.equals("update") || providerInputDTO.providerTypeId() != veterinarianType) {
+                providerOut = providerRepository.save(provider);
             }
-            
+
         } catch (Exception e) {
             throw new InvalidInputException(globalExceptionHandler.extractErrorMessage(e.getMessage()));
         }
 
         if (providerInputDTO.providerTypeId() == veterinarianType) {
+
             Clinic clinic = clinicRepository.findById(providerInputDTO.clinicId())
                     .orElseThrow(() -> new ResourceNotFoundException("Clinica no encontrada"));
 
@@ -104,14 +109,17 @@ public class ProviderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Especialidad no encontrada"));
 
             Veterinarian veterinarian = new Veterinarian();
-
             
+
             veterinarian.setProvider(provider);
             veterinarian.setClinic(clinic);
             veterinarian.setFax(providerInputDTO.fax());
             veterinarian.setSpeciality(speciality);
             veterinarian.setCityDistance(providerInputDTO.cityDistance());
-
+            if (type.equals("update")) {
+                veterinarian.setId(provider.getId());
+            }
+            
             try {
                 veterinarianRepository.save(veterinarian);
             } catch (Exception e) {
@@ -124,7 +132,7 @@ public class ProviderService {
 
     public ProviderResponseDTO createProvider(ProviderInputDTO providerInputDTO) {
         Provider provider = new Provider();
-        ProviderResponseDTO response = assignProvider(provider, providerInputDTO);
+        ProviderResponseDTO response = assignProvider(provider, providerInputDTO, "create");
         return response;
     }
 
@@ -158,7 +166,7 @@ public class ProviderService {
         if (good) {
             throw new ResourceAlreadyExistsException("Ya existe un proveedor con las mismas características.");
         }
-        ProviderResponseDTO response = assignProvider(provider, updatedInput);
+        ProviderResponseDTO response = assignProvider(provider, updatedInput, "update");
         return response;
     }
 

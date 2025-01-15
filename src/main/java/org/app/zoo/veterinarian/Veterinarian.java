@@ -27,8 +27,8 @@ public class Veterinarian {
     @Column(name = "id_proveedor")
     private Integer id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE) // Relación uno a uno
-    @MapsId // Indica que se comparte la clave primaria
+    @OneToOne(fetch = FetchType.EAGER) // Relación uno a uno
+    @MapsId
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Provider provider;
 
