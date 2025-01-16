@@ -11,4 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public interface VeterinarianRepository extends JpaRepository<Veterinarian, Integer>, JpaSpecificationExecutor<Veterinarian> {
 
+    // Verificar si existe un veterinario por fax, clínica, proveedor y especialidad
+    boolean existsByFaxAndClinicIdAndSpecialityId(String fax, int clinicId, int specialityId);
+
 }
