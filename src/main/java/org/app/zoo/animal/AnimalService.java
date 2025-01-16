@@ -87,8 +87,8 @@ public class AnimalService {
                 animal.getWeight(),
                 animal.getBreed().getName(),
                 animal.getBreed().getSpecies().getName(),
-                animal.getBreed().getId_breed(),
                 animal.getBreed().getSpecies().getId_species(),
+                animal.getBreed().getId_breed(),
                 animal.getEntry_date());
         return animalOutputDTO;
     }
